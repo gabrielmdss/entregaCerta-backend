@@ -17,4 +17,12 @@ export default class AssistidoService {
         }
         return show
     }
+    async insert(input: IAssistido): Promise<IAssistido>{
+        const assistido = await this.assistidoRepository.insert(input);
+
+        if (!assistido) {
+            throw new AppError('Assistido não cadastrado', status.INTERNAL_SERVER);
+        }
+        return assistido
+    }
 } 

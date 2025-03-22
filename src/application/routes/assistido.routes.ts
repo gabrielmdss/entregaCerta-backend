@@ -15,6 +15,9 @@ assistidoRoutes.get('/assistido', (req,res, next) => {
 assistidoRoutes.get('/assistido/:id', (req,res, next) => {
     assistidoController.getById(req, res, next)
 });
+assistidoRoutes.post('/assistido', (req,res, next) => {
+    assistidoController.insert(req, res, next)
+});
 
 
 

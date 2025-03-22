@@ -23,11 +23,11 @@ export const insertAssistido = () => {
     return `
         insert into assistidos (
             nome,
-            documento,
+            documento
             )
         values (
-            @nome,
-            @documento
+            $1,
+            $2
             )
         returning *
     `
