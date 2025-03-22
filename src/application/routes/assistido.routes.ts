@@ -12,5 +12,10 @@ const assistidoController = new AssistidoController(assistidoService);
 assistidoRoutes.get('/assistido', (req,res, next) => {
     assistidoController.getAll(req, res, next)
 });
+assistidoRoutes.get('/assistido/:id', (req,res, next) => {
+    assistidoController.getById(req, res, next)
+});
+
+
 
 export default assistidoRoutes;

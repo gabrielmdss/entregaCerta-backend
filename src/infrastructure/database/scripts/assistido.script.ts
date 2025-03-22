@@ -14,7 +14,8 @@ export const selectAssistidoById = () => {
         id,
         nome,
         documento
-    where id = @id
+    from assistidos
+    where id = $1
     `
 }
 
