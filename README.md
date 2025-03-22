@@ -4,7 +4,7 @@
 
 ## 📋 Funcionalidades
 
-- Cadastro de assistidos com nome, documento (RG/CPF) e código único de 4 dígitos.
+- Cadastro de assistidos com nome, documento (RG/CPF), imagem do documento e código único de 4 dígitos.
 - Registro de cada retirada de cesta com data e identificação do assistido.
 - Busca rápida por código, nome, documento ou data da retirada.
 - Histórico de entregas para controle e acompanhamento.
@@ -12,12 +12,13 @@
 ## 🗂️ Estrutura do Banco de Dados (PostgreSQL)
 
 ### Tabela: `assistidos`
-| Coluna      | Tipo     | Descrição                        |
-|-------------|----------|----------------------------------|
-| id          | SERIAL   | Identificador único              |
-| nome        | TEXT     | Nome completo do assistido       |
-| documento   | TEXT     | Documento (RG ou CPF) - Único    |
-| codigo      | CHAR(4)  | Código de 4 dígitos - Único      |
+| Coluna          | Tipo     | Descrição                        |
+|-----------------|----------|----------------------------------|
+| id              | SERIAL   | Identificador único              |
+| nome            | TEXT     | Nome completo do assistido       |
+| documento       | TEXT     | Documento (RG ou CPF) - Único    |
+| codigo          | CHAR(4)  | Código de 4 dígitos - Único      |
+| imagem_documento| TEXT     | Caminho ou URL da imagem do documento |
 
 ### Tabela: `retiradas`
 | Coluna        | Tipo     | Descrição                                |
@@ -78,4 +79,3 @@
 
 Se precisar de ajuda ou tiver sugestões, entre em contato! 😊
 
-# entregaCerta-backend
