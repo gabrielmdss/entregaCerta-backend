@@ -3,8 +3,7 @@ export const selectAllAssistidos = () => {
     select 
         id,
         nome,
-        documento,
-        imagem_documento
+        documento
     from assistidos
     `
 }
@@ -14,8 +13,7 @@ export const selectAssistidoById = () => {
     select 
         id,
         nome,
-        documento,
-        imagem_documento
+        documento
     where id = @id
     `
 }
@@ -25,12 +23,10 @@ export const insertAssistido = () => {
         insert into assistidos (
             nome,
             documento,
-            imagem_documento
             )
         values (
             @nome,
-            @documento,
-            @imagem_documento
+            @documento
             )
         returning *
     `
@@ -41,8 +37,7 @@ export const updateAssistido = () => {
         update assistidos 
             set 
                 nome = coalesce(@nome, nome),
-                documento = coalesce(@documento, documento),
-                imagem_documento = coalesce(@imagem_documento, imagem_documento)
+                documento = coalesce(@documento, documento)
             where id = @id
             returning *
     `
