@@ -37,9 +37,9 @@ export const updateAssistido = () => {
     return `
         update assistidos 
             set 
-                nome = coalesce(@nome, nome),
-                documento = coalesce(@documento, documento)
-            where id = @id
+                nome = coalesce($1, nome),
+                documento = coalesce($2, documento)
+            where id = $3
             returning *
     `
 }

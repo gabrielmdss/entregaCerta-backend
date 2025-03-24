@@ -1,10 +1,9 @@
 import AppError from "../../../application/errors/appError";
-import BadRequest from "../../../application/errors/appError";
 import { getErrorMessage } from "../../../constraints/sql.errors.code";
 import { IAssistido } from "../../../domain/entity/assistido.entity";
 import { AssistidoRepository } from "../../../domain/repository/assistido.repository";
 import { pool } from "../../config/database";
-import { insertAssistido, selectAllAssistidos, selectAssistidoById } from "../scripts/assistido.script";
+import { insertAssistido, selectAllAssistidos, selectAssistidoById, updateAssistido } from "../scripts/assistido.script";
 export default class AssistidoDatabaseRepository implements AssistidoRepository {
     async selectAll(): Promise<IAssistido[]> {
         try {
@@ -38,9 +37,20 @@ export default class AssistidoDatabaseRepository implements AssistidoRepository 
             throw new AppError('Erro desconhecido', error)
         }
     }
-    // update(id: number, input: IAssistido): Promise<IAssistido> {
-        
-    // }
+    async update(id: number, input: IAssistido): Promise<IAssistido> {
+        const client = await pool.connect();
+        try {
+            const {nome, documento} = input;
+            await client.query('BEGIN');
+            const update = (await client.query(updateAssistido(), [nome, documento, id])).rows[0];
+            await client.query('COMMIT');
+            return update
+        } catch (error: any) {
+            await client.query('ROLLBACK');
+            getErrorMessage(error);
+            throw new AppError('Erro desconhecido', error)
+        }
+    }
     // delete(id: number): Promise<void> {
         
     // }

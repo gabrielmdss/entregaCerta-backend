@@ -34,5 +34,16 @@ export default class AssistidoController {
             next(error)
         }
     }
+    async update(request: Request, response: Response, next:NextFunction){
+        try {
+            const { id } = request.params;
+            const { input } = request.body
+            const update = await this.assistidoService.update(+id, input);
+            return response.status(status.SUCCESS).json(update)
+        } catch (error) {
+            console.log(error)
+            next(error)
+        }
+    }
 
 }
