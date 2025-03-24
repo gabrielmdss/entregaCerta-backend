@@ -1,0 +1,30 @@
+import { Router } from "express";
+import RetiradaController from "../controllers/retirada.controller";
+import RetiradaService from "../services/retirada.service";
+import RetiradaDatabaseRepository from "../../infrastructure/database/repository/retirada.repository";
+
+const retiradaRoutes = Router();
+
+const retiradaDatabase = new RetiradaDatabaseRepository();
+const retiradaService = new RetiradaService(retiradaDatabase);
+const retiradaController = new RetiradaController(retiradaService);
+
+retiradaRoutes.get('/retirada', (req,res, next) => {
+    retiradaController.getAll(req, res, next)
+});
+retiradaRoutes.get('/retirada/:id', (req,res, next) => {
+    retiradaController.getById(req, res, next)
+});
+retiradaRoutes.post('/retirada', (req,res, next) => {
+    retiradaController.insert(req, res, next)
+});
+retiradaRoutes.put('/retirada/:id', (req,res, next) => {
+    retiradaController.update(req, res, next)
+});
+retiradaRoutes.delete('/retirada/:id', (req,res, next) => {
+    retiradaController.delete(req, res, next)
+});
+
+
+
+export default retiradaRoutes;
