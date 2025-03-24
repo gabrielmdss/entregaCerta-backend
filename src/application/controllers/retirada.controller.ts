@@ -85,4 +85,14 @@ export default class RetiradaController {
             next(error)
         }
     }
+    async selectRetiradasByDataIntervalo(request: Request, response: Response, next:NextFunction){
+        try {
+            const { dataInicial, dataFinal } = request.params;
+            const show = await this.retiradaService.selectRetiradaByDataIntervalo(dataInicial, dataFinal);
+            return response.status(status.SUCCESS).json(show)
+        } catch (error) {
+            console.log(error)
+            next(error)
+        }
+    }
 }

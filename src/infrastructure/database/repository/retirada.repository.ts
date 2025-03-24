@@ -3,7 +3,7 @@ import { getErrorMessage } from "../../../constraints/sql.errors.code";
 import { IRetirada } from "../../../domain/entity/retirada.entity";
 import { RetiradaRepository } from "../../../domain/repository/retirada.repository";
 import { pool } from "../../config/database";
-import { countRetiradasByAssistidoId, deleteRetirada, insertRetirada, selectAllretiradas, selectRetiradaByAssistidoId, selectRetiradaByData, selectRetiradaById, updateRetirada } from "../scripts/retirada.script";
+import { countRetiradasByAssistidoId, deleteRetirada, insertRetirada, selectAllretiradas, selectRetiradaByAssistidoId, selectRetiradaByData, selectRetiradaByDataIntervalo, selectRetiradaById, updateRetirada } from "../scripts/retirada.script";
 
 export default class RetiradaDatabaseRepository implements RetiradaRepository {
     async selectAll(): Promise<IRetirada[]> {
@@ -87,6 +87,15 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
         try {
             const index = (await  pool.query(selectRetiradaByData(),[data])).rows;
             return index
+        } catch (error: any) {
+            getErrorMessage(error);
+            throw new AppError('Erro desconhecido', error)
+        }
+    }
+    async selectByDataIntervalo(dataInicial: string, dataFinal: string): Promise<IRetirada[]> {
+        try {
+            const index = (await pool.query(selectRetiradaByDataIntervalo(),[dataInicial, dataFinal])).rows;
+            return index;
         } catch (error: any) {
             getErrorMessage(error);
             throw new AppError('Erro desconhecido', error)

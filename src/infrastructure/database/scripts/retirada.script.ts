@@ -77,3 +77,16 @@ export const selectRetiradaByData = () => {
     where data_retirada = $1
     `
 }
+
+export const selectRetiradaByDataIntervalo = () => {
+    return `
+    select 
+        id,
+        assistido_id,
+        data_retirada
+    from retiradas
+    where data_retirada between $1 and $2
+    order by
+    data_retirada desc
+    `
+}

@@ -1,3 +1,4 @@
+import { selectRetiradaByDataIntervalo } from "./../../infrastructure/database/scripts/retirada.script";
 import AppError from "../errors/appError";
 import * as status from "../../constraints/http.status";
 import { RetiradaRepository } from "../../domain/repository/retirada.repository";
@@ -64,13 +65,56 @@ export default class RetiradaService {
     }
     return show;
   }
-  async selectRetiradasByData(data: string): Promise<IRetirada[]>{
+  async selectRetiradasByData(data: string): Promise<IRetirada[]> {
     const index = this.retiradaRepository.selectByData(data);
-    
-    if(!index){
-      throw new AppError("Retirada não encontrada nesta data", status.NOT_FOUND);
+
+    if (!index) {
+      throw new AppError(
+        "Retirada não encontrada nesta data",
+        status.NOT_FOUND
+      );
     }
-    
+
     return index;
+  }
+  async selectRetiradaByDataIntervalo(
+    dataInicial: string,
+    dataFinal: string
+  ): Promise<IRetirada[]> {
+    if (!dataInicial || !dataFinal) {
+      throw new AppError(
+        "As datas de início e fim são obrigatórias.",
+        status.BAD_REQUEST
+      );
+    }
+
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateRegex.test(dataInicial) || !dateRegex.test(dataFinal)) {
+      throw new AppError(
+        "As datas devem estar no formato 'AAAA-MM-DD'.",
+        status.BAD_REQUEST
+      );
+    }
+
+    if (new Date(dataInicial) > new Date(dataFinal)) {
+      throw new AppError(
+        "A data inicial não pode ser posterior à data final.",
+        status.BAD_REQUEST
+      );
+    }
+
+    const retiradas = await this.retiradaRepository.selectByDataIntervalo(
+      dataInicial,
+      dataFinal
+    );
+
+    if (!retiradas) {
+      throw new AppError(
+        "Nenhuma retirada encontrada no intervalo especificado.",
+        status.NOT_FOUND
+      );
+    }
+
+    return retiradas;
   }
 }
