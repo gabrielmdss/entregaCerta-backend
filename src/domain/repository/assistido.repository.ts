@@ -10,5 +10,4 @@ export interface AssistidoRepository {
     //==================================================>
     selectByDocumento(documento: string): Promise<IAssistido>;
     countAllAssistidos(): Promise<number>;
-    // selectAssistidosSemRetiradasDesde(data: string): Promise<IAssistido[]>;
 }
