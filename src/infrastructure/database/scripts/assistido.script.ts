@@ -45,10 +45,7 @@ export const updateAssistido = () => {
 }
 
 export const deleteAssistido = () => {
-    return `
-        delete *
-        from assistidos
-        where id = @id
-        returning *
+    return `delete from assistidos
+        where id = $1
     `
 }

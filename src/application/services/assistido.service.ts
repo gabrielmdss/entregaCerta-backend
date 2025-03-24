@@ -44,4 +44,19 @@ export default class AssistidoService {
 
     return assistidoAtualizado;
   }
+  async delete(id: number): Promise<void> {
+    const assistido = await this.assistidoRepository.selectById(id);
+
+    if (!assistido) {
+      throw new AppError("Assistido não encontrado", status.INTERNAL_SERVER);
+    }
+
+    const deleteAssistido = await this.assistidoRepository.delete(
+      id
+    );
+
+    return;
+  }
+
+
 }

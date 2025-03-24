@@ -5,5 +5,5 @@ export interface AssistidoRepository {
     selectById(id: number): Promise<IAssistido>;
     insert(input: IAssistido): Promise<IAssistido>;
     update(id: number, input: IAssistido): Promise<IAssistido>;
-    // delete(id: number): Promise<void>;
+    delete(id: number): Promise<void>;
 }

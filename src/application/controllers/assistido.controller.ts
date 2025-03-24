@@ -45,5 +45,15 @@ export default class AssistidoController {
             next(error)
         }
     }
+    async delete(request: Request, response: Response, next:NextFunction){
+        try {
+            const { id } = request.params;
+            const deleteAssitido = await this.assistidoService.delete(+id);
+            return response.status(status.NO_CONTENT).json(deleteAssitido)
+        } catch (error) {
+            console.log(error)
+            next(error)
+        }
+    }
 
 }
