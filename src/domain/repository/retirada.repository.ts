@@ -6,4 +6,6 @@ export interface RetiradaRepository {
         insert(input: IRetirada): Promise<IRetirada>;
         update(id: number, input: IRetirada): Promise<IRetirada>;
         delete(id: number): Promise<void>;
+        // =====================================>
+        selectByAssistidoId(id: number): Promise<IRetirada[]>;
 }

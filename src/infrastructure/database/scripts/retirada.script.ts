@@ -18,6 +18,16 @@ export const selectRetiradaById = () => {
     where id = $1
     `
 }
+export const selectRetiradaByAssistidoId = () => {
+    return `
+    select 
+        id,
+        assistido_id,
+        data_retirada
+    from retiradas
+    where assistido_id = $1
+    `
+}
 
 export const insertRetirada = () => {
     return `

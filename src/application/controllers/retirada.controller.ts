@@ -24,6 +24,16 @@ export default class RetiradaController {
             next(error)
         }
     }
+    async getByAssistidoId(request: Request, response: Response, next:NextFunction){
+        try {
+            const {id} = request.params;
+            const show = await this.retiradaService.getByAssistidoId(+id);
+            return response.status(status.SUCCESS).json(show)
+        } catch (error) {
+            console.log(error)
+            next(error)
+        }
+    }
     async insert(request: Request, response: Response, next:NextFunction){
         try {
             const { input } = request.body

@@ -17,6 +17,14 @@ export default class RetiradaService {
     }
     return show;
   }
+  async getByAssistidoId(id: number): Promise<IRetirada[]> {
+    const show = await this.retiradaRepository.selectByAssistidoId(id);
+
+    if (!show) {
+      throw new AppError("Retirada não encontrada", status.NOT_FOUND);
+    }
+    return show;
+  }
   async insert(input: IRetirada): Promise<IRetirada> {
     if (!input.assistido_id) {
       throw new AppError("Preencha todos os dados", status.BAD_REQUEST);
