@@ -66,3 +66,14 @@ export const countRetiradasByAssistidoId = () => {
         where assistido_id = $1
     `
 }
+
+export const selectRetiradaByData = () => {
+    return `
+    select 
+        id,
+        assistido_id,
+        data_retirada
+    from retiradas
+    where data_retirada = $1
+    `
+}

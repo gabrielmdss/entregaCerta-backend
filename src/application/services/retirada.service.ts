@@ -64,4 +64,13 @@ export default class RetiradaService {
     }
     return show;
   }
+  async selectRetiradasByData(data: string): Promise<IRetirada[]>{
+    const index = this.retiradaRepository.selectByData(data);
+    
+    if(!index){
+      throw new AppError("Retirada não encontrada nesta data", status.NOT_FOUND);
+    }
+    
+    return index;
+  }
 }

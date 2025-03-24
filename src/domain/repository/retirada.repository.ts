@@ -9,4 +9,5 @@ export interface RetiradaRepository {
         // =====================================>
         selectByAssistidoId(id: number): Promise<IRetirada[]>;
         countRetiradasByAssistido(id: number): Promise<number>;
+        selectByData(data: string): Promise<IRetirada[]>;
 }
