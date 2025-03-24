@@ -67,4 +67,12 @@ export default class AssistidoService {
 
     return;
   }
+  async countAllAssistidos(): Promise<number> {
+    const show = await this.assistidoRepository.countAllAssistidos();
+
+    if (!show) {
+      throw new AppError("Nenhum assistido cadastrado", status.NOT_FOUND);
+    }
+    return show;
+  }
 }

@@ -65,5 +65,14 @@ export default class AssistidoController {
             next(error)
         }
     }
+    async countAllAssistidos(request: Request, response: Response, next:NextFunction){
+        try {
+            const show = await this.assistidoService.countAllAssistidos();
+            return response.status(status.SUCCESS).json({total: show})
+        } catch (error) {
+            console.log(error)
+            next(error)
+        }
+    }
 
 }

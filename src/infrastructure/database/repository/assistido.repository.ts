@@ -3,7 +3,7 @@ import { getErrorMessage } from "../../../constraints/sql.errors.code";
 import { IAssistido } from "../../../domain/entity/assistido.entity";
 import { AssistidoRepository } from "../../../domain/repository/assistido.repository";
 import { pool } from "../../config/database";
-import { deleteAssistido, insertAssistido, selectAllAssistidos, selectAssistidoByDocumento, selectAssistidoById, updateAssistido } from "../scripts/assistido.script";
+import { countAssistidos, deleteAssistido, insertAssistido, selectAllAssistidos, selectAssistidoByDocumento, selectAssistidoById, updateAssistido } from "../scripts/assistido.script";
 export default class AssistidoDatabaseRepository implements AssistidoRepository {
     async selectAll(): Promise<IAssistido[]> {
         try {
@@ -69,6 +69,16 @@ export default class AssistidoDatabaseRepository implements AssistidoRepository 
             return
         } catch (error: any) {
             await client.query('ROLLBACK');
+            getErrorMessage(error);
+            throw new AppError('Erro desconhecido', error)
+        }
+    }
+    async countAllAssistidos(): Promise<number> {
+        try {
+            const result = await pool.query(countAssistidos());
+            const totalAssistidos: number = result.rows[0].total;    
+            return totalAssistidos
+        } catch (error: any) {
             getErrorMessage(error);
             throw new AppError('Erro desconhecido', error)
         }

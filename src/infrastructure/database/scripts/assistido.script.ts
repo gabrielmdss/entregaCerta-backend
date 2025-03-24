@@ -59,3 +59,9 @@ export const deleteAssistido = () => {
         where id = $1
     `
 }
+
+export const countAssistidos = () => {
+    return `
+        select count(id)::int as total from assistidos
+    `
+}
