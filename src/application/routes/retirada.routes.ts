@@ -12,14 +12,17 @@ const retiradaController = new RetiradaController(retiradaService);
 retiradaRoutes.get('/retirada', (req,res, next) => {
     retiradaController.getAll(req, res, next)
 });
-retiradaRoutes.get('/retirada/:id', (req,res, next) => {
-    retiradaController.getById(req, res, next)
+retiradaRoutes.post('/retirada', (req,res, next) => {
+    retiradaController.insert(req, res, next)
+});
+retiradaRoutes.get('/retirada/total/:id', (req,res, next) => {
+    retiradaController.countRetiradasByAssistidoId(req, res, next)
 });
 retiradaRoutes.get('/retirada/assistido/:id', (req,res, next) => {
     retiradaController.getByAssistidoId(req, res, next)
 });
-retiradaRoutes.post('/retirada', (req,res, next) => {
-    retiradaController.insert(req, res, next)
+retiradaRoutes.get('/retirada/:id', (req,res, next) => {
+    retiradaController.getById(req, res, next)
 });
 retiradaRoutes.put('/retirada/:id', (req,res, next) => {
     retiradaController.update(req, res, next)

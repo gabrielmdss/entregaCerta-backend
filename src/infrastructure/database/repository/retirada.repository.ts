@@ -3,7 +3,7 @@ import { getErrorMessage } from "../../../constraints/sql.errors.code";
 import { IRetirada } from "../../../domain/entity/retirada.entity";
 import { RetiradaRepository } from "../../../domain/repository/retirada.repository";
 import { pool } from "../../config/database";
-import { deleteRetirada, insertRetirada, selectAllretiradas, selectRetiradaByAssistidoId, selectRetiradaById, updateRetirada } from "../scripts/retirada.script";
+import { countRetiradasByAssistidoId, deleteRetirada, insertRetirada, selectAllretiradas, selectRetiradaByAssistidoId, selectRetiradaById, updateRetirada } from "../scripts/retirada.script";
 
 export default class RetiradaDatabaseRepository implements RetiradaRepository {
     async selectAll(): Promise<IRetirada[]> {
@@ -70,6 +70,15 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
             return
         } catch (error: any) {
             await client.query('ROLLBACK');
+            getErrorMessage(error);
+            throw new AppError('Erro desconhecido', error)
+        }
+    }
+    async countRetiradasByAssistido(id: number): Promise<number> {
+        try {
+            const show = (await  pool.query(countRetiradasByAssistidoId(),[id])).rows[0];
+            return show
+        } catch (error: any) {
             getErrorMessage(error);
             throw new AppError('Erro desconhecido', error)
         }

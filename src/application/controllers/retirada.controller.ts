@@ -1,3 +1,4 @@
+import { countRetiradasByAssistidoId } from './../../infrastructure/database/scripts/retirada.script';
 import { Request, Response, NextFunction } from "express";
 import * as status from '../../constraints/http.status'
 import RetiradaService from "../services/retirada.service";
@@ -65,5 +66,14 @@ export default class RetiradaController {
             next(error)
         }
     }
-
+    async countRetiradasByAssistidoId(request: Request, response: Response, next:NextFunction){
+        try {
+            const { id } = request.params;
+            const show = await this.retiradaService.countRetiradasByAssistidoId(+id);
+            return response.status(status.SUCCESS).json(show)
+        } catch (error) {
+            console.log(error)
+            next(error)
+        }
+    }
 }

@@ -8,4 +8,5 @@ export interface RetiradaRepository {
         delete(id: number): Promise<void>;
         // =====================================>
         selectByAssistidoId(id: number): Promise<IRetirada[]>;
+        countRetiradasByAssistido(id: number): Promise<number>;
 }

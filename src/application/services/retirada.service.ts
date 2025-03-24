@@ -56,4 +56,12 @@ export default class RetiradaService {
 
     return;
   }
+  async countRetiradasByAssistidoId(id: number): Promise<number> {
+    const show = await this.retiradaRepository.countRetiradasByAssistido(id);
+
+    if (!show) {
+      throw new AppError("Retirada não encontrada", status.NOT_FOUND);
+    }
+    return show;
+  }
 }
