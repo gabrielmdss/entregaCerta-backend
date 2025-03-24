@@ -18,6 +18,16 @@ export const selectAssistidoById = () => {
     where id = $1
     `
 }
+export const selectAssistidoByDocumento = () => {
+    return `
+    select 
+        id,
+        nome,
+        documento
+    from assistidos
+    where documento = $1
+    `
+}
 
 export const insertAssistido = () => {
     return `

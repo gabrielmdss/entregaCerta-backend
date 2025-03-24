@@ -17,19 +17,31 @@ export default class AssistidoService {
     }
     return show;
   }
-  async insert(input: IAssistido): Promise<IAssistido> {
-    const assistido = await this.assistidoRepository.insert(input);
+  async getByDocumento(documento: string): Promise<IAssistido> {
+    const show = await this.assistidoRepository.selectByDocumento(documento);
 
-    if (input.nome || !input.documento) {
+    if (!show) {
+      throw new AppError("Assistido não encontrado", status.NOT_FOUND);
+    }
+    return show;
+  }
+  async insert(input: IAssistido): Promise<IAssistido> {
+    
+    if (!input.nome || !input.documento) {
       throw new AppError("Preencha todos os dados", status.BAD_REQUEST);
     }
-
-    if (!assistido) {
-      throw new AppError("Assistido não encontrado", status.INTERNAL_SERVER);
+    
+    const assistidoByDocumento =
+    await this.assistidoRepository.selectByDocumento(input.documento);
+    
+    if (assistidoByDocumento) {
+      throw new AppError("Documento já cadastrado", status.INTERNAL_SERVER);
     }
+    
+    const assistido = await this.assistidoRepository.insert(input);
+
     return assistido;
   }
-
   async update(id: number, input: IAssistido): Promise<IAssistido> {
     const assistido = await this.assistidoRepository.selectById(id);
 
@@ -51,12 +63,8 @@ export default class AssistidoService {
       throw new AppError("Assistido não encontrado", status.INTERNAL_SERVER);
     }
 
-    const deleteAssistido = await this.assistidoRepository.delete(
-      id
-    );
+    const deleteAssistido = await this.assistidoRepository.delete(id);
 
     return;
   }
-
-
 }
