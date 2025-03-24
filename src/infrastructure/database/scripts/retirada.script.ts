@@ -32,10 +32,12 @@ export const selectRetiradaByAssistidoId = () => {
 export const insertRetirada = () => {
     return `
         insert into retiradas (
-            assistido_id
+            assistido_id,
+            data_retirada
             )
         values (
-            $1
+            $1,
+            coalesce($2, CURRENT_DATE)
             )
         returning *
     `

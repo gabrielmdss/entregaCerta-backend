@@ -36,9 +36,9 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
     async insert(input: IRetirada): Promise<IRetirada> {
         const client = await pool.connect();
         try {
-            const {assistido_id} = input;
+            const {assistido_id, data_retirada} = input;
             await client.query('BEGIN');
-            const insert = (await client.query(insertRetirada(), [assistido_id])).rows[0];
+            const insert = (await client.query(insertRetirada(), [assistido_id, data_retirada])).rows[0];
             await client.query('COMMIT');
             return insert
         } catch (error: any) {
