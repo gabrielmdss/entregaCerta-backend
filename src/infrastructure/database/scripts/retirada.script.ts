@@ -92,3 +92,16 @@ export const selectRetiradaByDataIntervalo = () => {
     data_retirada desc
     `
 }
+
+export const countRetiradasByMes = () => {
+    return `
+    SELECT 
+    TO_CHAR(data_retirada, 'FMMonth "de" YYYY') AS mes,
+    COUNT(*) AS total
+FROM retiradas
+WHERE EXTRACT(YEAR FROM data_retirada) = $1
+GROUP BY mes
+ORDER BY MIN(data_retirada);
+
+    `;
+};

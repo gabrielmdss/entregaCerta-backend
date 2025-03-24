@@ -1,9 +1,9 @@
 import AppError from "../../../application/errors/appError";
 import { getErrorMessage } from "../../../constraints/sql.errors.code";
-import { IRetirada } from "../../../domain/entity/retirada.entity";
+import { IRetirada, IRetiradasPorMes } from "../../../domain/entity/retirada.entity";
 import { RetiradaRepository } from "../../../domain/repository/retirada.repository";
 import { pool } from "../../config/database";
-import { countRetiradasByAssistidoId, deleteRetirada, insertRetirada, selectAllretiradas, selectRetiradaByAssistidoId, selectRetiradaByData, selectRetiradaByDataIntervalo, selectRetiradaById, updateRetirada } from "../scripts/retirada.script";
+import { countRetiradasByAssistidoId, countRetiradasByMes, deleteRetirada, insertRetirada, selectAllretiradas, selectRetiradaByAssistidoId, selectRetiradaByData, selectRetiradaByDataIntervalo, selectRetiradaById, updateRetirada } from "../scripts/retirada.script";
 
 export default class RetiradaDatabaseRepository implements RetiradaRepository {
     async selectAll(): Promise<IRetirada[]> {
@@ -96,6 +96,15 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
         try {
             const index = (await pool.query(selectRetiradaByDataIntervalo(),[dataInicial, dataFinal])).rows;
             return index;
+        } catch (error: any) {
+            getErrorMessage(error);
+            throw new AppError('Erro desconhecido', error)
+        }
+    }
+    async countByMes(ano: string): Promise<IRetiradasPorMes[]> {
+        try {
+            const index = (await pool.query(countRetiradasByMes(),[ano])).rows;
+            return index
         } catch (error: any) {
             getErrorMessage(error);
             throw new AppError('Erro desconhecido', error)

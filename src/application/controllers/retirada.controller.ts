@@ -95,4 +95,14 @@ export default class RetiradaController {
             next(error)
         }
     }
+    async countRetiradasMesByAno(request: Request, response: Response, next:NextFunction){
+        try {
+            const { ano } = request.params;
+            const show = await this.retiradaService.countRetiradasMesByAno(ano);
+            return response.status(status.SUCCESS).json(show)
+        } catch (error) {
+            console.log(error)
+            next(error)
+        }
+    }
 }

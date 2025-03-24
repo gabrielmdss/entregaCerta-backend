@@ -1,4 +1,4 @@
-import { IRetirada } from "../entity/retirada.entity";
+import { IRetirada, IRetiradasPorMes } from "../entity/retirada.entity";
 
 export interface RetiradaRepository {
         selectAll(): Promise<IRetirada[]>;
@@ -11,4 +11,8 @@ export interface RetiradaRepository {
         countRetiradasByAssistido(id: number): Promise<number>;
         selectByData(data: string): Promise<IRetirada[]>;
         selectByDataIntervalo(dataInicial: string, dataFinal: string): Promise<IRetirada[]>;
+        countByMes(ano: string): Promise<IRetiradasPorMes[]>;
+        // selectPrimeiraRetiradaEUltimaRetirada(assistidoId: number): Promise<{ primeiraRetirada: Date; ultimaRetirada: Date }>;
+        // selectTaxaDeParticipacaoMensal(): Promise<number>;
+
 }

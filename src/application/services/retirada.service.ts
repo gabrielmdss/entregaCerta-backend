@@ -2,7 +2,7 @@ import { selectRetiradaByDataIntervalo } from "./../../infrastructure/database/s
 import AppError from "../errors/appError";
 import * as status from "../../constraints/http.status";
 import { RetiradaRepository } from "../../domain/repository/retirada.repository";
-import { IRetirada } from "../../domain/entity/retirada.entity";
+import { IRetirada, IRetiradasPorMes } from "../../domain/entity/retirada.entity";
 
 export default class RetiradaService {
   constructor(private readonly retiradaRepository: RetiradaRepository) {}
@@ -116,5 +116,15 @@ export default class RetiradaService {
     }
 
     return retiradas;
+  }
+  async countRetiradasMesByAno(ano: string): Promise<IRetiradasPorMes[]>{
+    const retiradas = await this.retiradaRepository.countByMes(ano);
+    if (!retiradas || !retiradas.length) {
+      throw new AppError(
+        "Retiradas não encontradas neste ano",
+        status.NOT_FOUND
+      );
+    }
+    return retiradas 
   }
 }
