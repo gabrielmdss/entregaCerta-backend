@@ -1,31 +1,44 @@
 export const selectAllretiradas = () => {
     return `
-    select 
-        id,
-        assistido_id,
-        data_retirada
-    from retiradas
+    SELECT 
+        r.id,
+        r.assistido_id,
+        a.nome,
+        a.documento,
+        r.data_retirada
+    FROM retiradas r
+    INNER JOIN assistidos a
+    ON r.assistido_id = a.id
+    ORDER BY r.data_retirada DESC;
     `
 }
 
 export const selectRetiradaById = () => {
     return `
-    select 
-        id,
-        assistido_id,
-        data_retirada
-    from retiradas
-    where id = $1
+    SELECT 
+        r.id,
+        r.assistido_id,
+        a.nome,
+        a.documento,
+        r.data_retirada
+    FROM retiradas r
+    INNER JOIN assistidos a
+    ON r.assistido_id = a.id
+    where r.id = $1
     `
 }
 export const selectRetiradaByAssistidoId = () => {
     return `
-    select 
-        id,
-        assistido_id,
-        data_retirada
-    from retiradas
-    where assistido_id = $1
+    SELECT 
+        r.id,
+        r.assistido_id,
+        a.nome,
+        a.documento,
+        r.data_retirada
+    FROM retiradas r
+    INNER JOIN assistidos a
+    ON r.assistido_id = a.id
+    where r.assistido_id = $1
     `
 }
 
@@ -71,25 +84,33 @@ export const countRetiradasByAssistidoId = () => {
 
 export const selectRetiradaByData = () => {
     return `
-    select 
-        id,
-        assistido_id,
-        data_retirada
-    from retiradas
-    where data_retirada = $1
+    SELECT 
+        r.id,
+        r.assistido_id,
+        a.nome,
+        a.documento,
+        r.data_retirada
+    FROM retiradas r
+    INNER JOIN assistidos a
+    ON r.assistido_id = a.id
+    where r.data_retirada = $1
     `
 }
 
 export const selectRetiradaByDataIntervalo = () => {
     return `
-    select 
-        id,
-        assistido_id,
-        data_retirada
-    from retiradas
-    where data_retirada between $1 and $2
-    order by
-    data_retirada desc
+    SELECT 
+        r.id,
+        r.assistido_id,
+        a.nome,
+        a.documento,
+        r.data_retirada
+    FROM retiradas r
+    INNER JOIN assistidos a
+    ON r.assistido_id = a.id
+    where r.data_retirada
+    between $1 and $2
+    order by r.data_retirada desc
     `
 }
 
@@ -101,7 +122,5 @@ export const countRetiradasByMes = () => {
 FROM retiradas
 WHERE EXTRACT(YEAR FROM data_retirada) = $1
 GROUP BY mes
-ORDER BY MIN(data_retirada);
-
-    `;
+ORDER BY MIN(data_retirada);`;
 };

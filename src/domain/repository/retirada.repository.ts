@@ -12,5 +12,4 @@ export interface RetiradaRepository {
         selectByData(data: string): Promise<IRetirada[]>;
         selectByDataIntervalo(dataInicial: string, dataFinal: string): Promise<IRetirada[]>;
         countByMes(ano: string): Promise<IRetiradasPorMes[]>;
-        
 }

@@ -6,7 +6,6 @@ export interface AssistidoRepository {
     insert(input: IAssistido): Promise<IAssistido>;
     update(id: number, input: IAssistido): Promise<IAssistido>;
     delete(id: number): Promise<void>;
-
     //==================================================>
     selectByDocumento(documento: string): Promise<IAssistido>;
     countAllAssistidos(): Promise<number>;
