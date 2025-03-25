@@ -1,8 +1,8 @@
 import cors from "cors";
 import "dotenv/config";
 import express, { Express } from "express";
-import routes from "./application/routes";
-import Errors from "./application/middlewares/errors";
+import routes from "./src/application/routes";
+import Errors from "./src/application/middlewares/errors";
 
 
 const PORT: string | undefined = process.env.PORT;
