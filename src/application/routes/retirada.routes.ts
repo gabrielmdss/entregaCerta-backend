@@ -15,6 +15,9 @@ retiradaRoutes.get('/retirada', (req,res, next) => {
 retiradaRoutes.post('/retirada', (req,res, next) => {
     retiradaController.insert(req, res, next)
 });
+retiradaRoutes.get('/retirada/ultimas', (req, res, next) => {
+    retiradaController.selectLastFiveRetiradas(req, res, next);
+});
 retiradaRoutes.get('/retirada/total/:id', (req,res, next) => {
     retiradaController.countRetiradasByAssistidoId(req, res, next)
 });

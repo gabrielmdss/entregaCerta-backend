@@ -124,3 +124,19 @@ WHERE EXTRACT(YEAR FROM data_retirada) = $1
 GROUP BY mes
 ORDER BY MIN(data_retirada);`;
 };
+
+export const selectLastFiveRetiradas = () => {
+    return `
+    SELECT 
+        r.id,
+        r.assistido_id,
+        a.nome,
+        a.documento,
+        r.data_retirada
+    FROM retiradas r
+    INNER JOIN assistidos a
+    ON r.assistido_id = a.id
+    ORDER BY data_retirada desc
+    LIMIT 5
+    `
+}

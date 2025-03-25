@@ -105,4 +105,13 @@ export default class RetiradaController {
             next(error)
         }
     }
+    async selectLastFiveRetiradas(request: Request, response: Response, next:NextFunction){
+        try {
+            const show = await this.retiradaService.selectLastFiveRetiradas();
+            return response.status(status.SUCCESS).json(show)
+        } catch (error) {
+            console.log(error)
+            next(error)
+        }
+    }
 }

@@ -127,4 +127,15 @@ export default class RetiradaService {
     }
     return retiradas 
   }
+  async selectLastFiveRetiradas(): Promise<IRetirada[]> {
+    const retiradas = await this.retiradaRepository.selectLastFive();
+    if (!retiradas || !retiradas.length) {
+      throw new AppError(
+        "Últimas retiradas não encontradas",
+        status.NOT_FOUND
+      );
+    }
+    return retiradas 
+  }
+
 }
