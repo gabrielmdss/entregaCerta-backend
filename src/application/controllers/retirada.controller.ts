@@ -36,7 +36,7 @@ export default class RetiradaController {
     }
     async insert(request: Request, response: Response, next:NextFunction){
         try {
-            const { input } = request.body
+            const input = request.body
             const insert = await this.retiradaService.insert(input);
             return response.status(status.CREATED).json(insert)
         } catch (error) {
