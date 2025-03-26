@@ -2,7 +2,10 @@ import { selectRetiradaByDataIntervalo } from "./../../infrastructure/database/s
 import AppError from "../errors/appError";
 import * as status from "../../constraints/http.status";
 import { RetiradaRepository } from "../../domain/repository/retirada.repository";
-import { IRetirada, IRetiradasPorMes } from "../../domain/entity/retirada.entity";
+import {
+  IRetirada,
+  IRetiradasPorMes,
+} from "../../domain/entity/retirada.entity";
 
 export default class RetiradaService {
   constructor(private readonly retiradaRepository: RetiradaRepository) {}
@@ -29,6 +32,11 @@ export default class RetiradaService {
   async insert(input: IRetirada): Promise<IRetirada> {
     if (!input.assistido_id) {
       throw new AppError("Preencha todos os dados", status.BAD_REQUEST);
+    }
+
+    if (!input.data_retirada || input.data_retirada === "") {
+      const dataToday = new Date().toISOString().split("T")[0];
+      input.data_retirada = dataToday
     }
 
     const retirada = await this.retiradaRepository.insert(input);
@@ -117,7 +125,7 @@ export default class RetiradaService {
 
     return retiradas;
   }
-  async countRetiradasMesByAno(ano: string): Promise<IRetiradasPorMes[]>{
+  async countRetiradasMesByAno(ano: string): Promise<IRetiradasPorMes[]> {
     const retiradas = await this.retiradaRepository.countByMes(ano);
     if (!retiradas || !retiradas.length) {
       throw new AppError(
@@ -125,17 +133,13 @@ export default class RetiradaService {
         status.NOT_FOUND
       );
     }
-    return retiradas 
+    return retiradas;
   }
   async selectLastFiveRetiradas(): Promise<IRetirada[]> {
     const retiradas = await this.retiradaRepository.selectLastFive();
     if (!retiradas || !retiradas.length) {
-      throw new AppError(
-        "Últimas retiradas não encontradas",
-        status.NOT_FOUND
-      );
+      throw new AppError("Últimas retiradas não encontradas", status.NOT_FOUND);
     }
-    return retiradas 
+    return retiradas;
   }
-
 }

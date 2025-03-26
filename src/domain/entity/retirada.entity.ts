@@ -1,7 +1,7 @@
 export interface IRetirada {
     id?: number;
     assistido_id: number;
-    data_retirada: Date;
+    data_retirada: Date | string;
 };
 
 export interface IRetiradasPorMes {
@@ -11,7 +11,7 @@ export interface IRetiradasPorMes {
 export default class Retirada {
     id?: number;
     assistido_id: number;
-    data_retirada: Date;
+    data_retirada: Date | string;
 
     constructor(input: IRetirada){
         this.id = input.id;

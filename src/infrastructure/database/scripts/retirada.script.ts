@@ -50,7 +50,7 @@ export const insertRetirada = () => {
             )
         values (
             $1,
-            coalesce($2, CURRENT_DATE)
+            $2
             )
         returning *
     `
