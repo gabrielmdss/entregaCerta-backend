@@ -2,7 +2,7 @@ import { IRetirada, IRetiradasPorMes } from "../entity/retirada.entity";
 
 export interface RetiradaRepository {
         selectAll(): Promise<IRetirada[]>;
-        selectById(id: number): Promise<IRetirada>;
+        selectById(id: number): Promise<IRetirada | null>;
         insert(input: IRetirada): Promise<IRetirada>;
         update(id: number, input: IRetirada): Promise<IRetirada>;
         delete(id: number): Promise<void>;
