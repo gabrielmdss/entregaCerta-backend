@@ -14,6 +14,24 @@ model assistidos {
   retiradas retiradas[]
 }
 
+model estoque {
+  id               Int                @id @default(autoincrement())
+  quantidade       Int
+  descricao        String?            @db.VarChar(255)
+  data_atualizacao DateTime?          @default(now()) @db.Timestamp(6)
+  retirada_estoque retirada_estoque[]
+}
+
+model retirada_estoque {
+  id                  Int       @id @default(autoincrement())
+  retirada_id         Int
+  quantidade_retirada Int
+  estoque_id          Int
+  data_retirada       DateTime? @default(now()) @db.Timestamp(6)
+  estoque             estoque   @relation(fields: [estoque_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  retiradas           retiradas @relation(fields: [retirada_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
 model retiradas {
   id            Int        @id @default(autoincrement())
   assistido_id  Int
