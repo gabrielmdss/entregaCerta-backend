@@ -10,9 +10,14 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 export default class RetiradaDatabaseRepository implements RetiradaRepository {
-  async selectAll(): Promise<IRetirada[]> {
+  async selectAll(page: number, pageSize: number): Promise<IRetirada[]> {
     try {
+      const skip = (page - 1) * pageSize;
+      const take = pageSize;
+
       const index = await prisma.retiradas.findMany({
+        skip,
+        take,
         include: {
           assistidos: {
             select: {
@@ -92,7 +97,7 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
       const insert = await prisma.retiradas.create({
         data: {
           assistido_id,
-          data_retirada: new Date(data_retirada),
+          data_retirada: data_retirada,
         },
       });
       return insert;
@@ -107,7 +112,7 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
       const update = prisma.retiradas.update({
         data: {
           assistido_id,
-          data_retirada: new Date (data_retirada),
+          data_retirada: new Date(data_retirada),
         },
         where: { id },
       });
@@ -123,6 +128,15 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
         where: { id },
       });
       return;
+    } catch (error: any) {
+      getErrorMessage(error);
+      throw new AppError("Erro desconhecido", error);
+    }
+  }
+  async countRetiradas(): Promise<number> {
+    try {
+      const index = prisma.retiradas.count()
+      return index
     } catch (error: any) {
       getErrorMessage(error);
       throw new AppError("Erro desconhecido", error);
@@ -154,7 +168,7 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
         where: { data_retirada: new Date(data) },
       });
 
-      const result = index.map(mapRetiradaToDTO)
+      const result = index.map(mapRetiradaToDTO);
       return result;
     } catch (error: any) {
       getErrorMessage(error);
@@ -186,7 +200,7 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
         },
       });
 
-      const result = retiradas.map(mapRetiradaToDTO)
+      const result = retiradas.map(mapRetiradaToDTO);
 
       return result;
     } catch (error: any) {
@@ -256,7 +270,7 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
         },
       });
 
-      const result = retiradas.map(mapRetiradaToDTO)
+      const result = retiradas.map(mapRetiradaToDTO);
 
       return result;
     } catch (error: any) {
