@@ -1,122 +1,229 @@
 import AppError from "../../../application/errors/appError";
 import { getErrorMessage } from "../../../constraints/sql.errors.code";
-import { IRetirada, IRetiradasPorMes } from "../../../domain/entity/retirada.entity";
+import {
+  IRetirada,
+  IRetiradasPorMes,
+} from "../../../domain/entity/retirada.entity";
 import { RetiradaRepository } from "../../../domain/repository/retirada.repository";
-import { pool } from "../../config/database";
-import { countRetiradasByAssistidoId, countRetiradasByMes, deleteRetirada, insertRetirada, selectAllretiradas, selectLastFiveRetiradas, selectRetiradaByAssistidoId, selectRetiradaByData, selectRetiradaByDataIntervalo, selectRetiradaById, updateRetirada } from "../scripts/retirada.script";
+import { PrismaClient } from "@prisma/client";
 
+const prisma = new PrismaClient();
 export default class RetiradaDatabaseRepository implements RetiradaRepository {
-    async selectAll(): Promise<IRetirada[]> {
-        try {
-            const index: IRetirada[] = (await pool.query(selectAllretiradas())).rows;
-            return index
-        } catch (error: any) {
-            getErrorMessage(error);
-            throw new AppError('Erro desconhecido', error)
-        }
+  async selectAll(): Promise<IRetirada[]> {
+    try {
+      const index = await prisma.retiradas.findMany({
+        select: {
+          id: true,
+          assistido_id: true,
+          data_retirada: true,
+        },
+      });
+      return index;
+    } catch (error: any) {
+      getErrorMessage(error);
+      throw new AppError("Erro desconhecido", error);
     }
-    async selectById(id: number): Promise<IRetirada> {
-        try {
-            const show = (await  pool.query(selectRetiradaById(),[id])).rows[0];
-            return show
-        } catch (error: any) {
-            getErrorMessage(error);
-            throw new AppError('Erro desconhecido', error)
-        }
+  }
+  async selectById(id: number): Promise<IRetirada | null> {
+    try {
+      const show = await prisma.retiradas.findUnique({
+        select: {
+          id: true,
+          assistido_id: true,
+          data_retirada: true,
+        },
+        where: { id },
+      });
+      return show;
+    } catch (error: any) {
+      getErrorMessage(error);
+      throw new AppError("Erro desconhecido", error);
     }
-    async selectByAssistidoId(id: number): Promise<IRetirada[]> {
-        try {
-            const show = (await  pool.query(selectRetiradaByAssistidoId(),[id])).rows;
-            return show
-        } catch (error: any) {
-            getErrorMessage(error);
-            throw new AppError('Erro desconhecido', error)
-        }
+  }
+  async selectByAssistidoId(id: number): Promise<IRetirada[]> {
+    try {
+      const show = await prisma.retiradas.findMany({
+        select: {
+          id: true,
+          assistido_id: true,
+          data_retirada: true,
+        },
+        where: { assistido_id: id },
+      });
+      return show;
+    } catch (error: any) {
+      getErrorMessage(error);
+      throw new AppError("Erro desconhecido", error);
     }
-    async insert(input: IRetirada): Promise<IRetirada> {
-        const client = await pool.connect();
-        try {
-            const {assistido_id, data_retirada} = input;
-            await client.query('BEGIN');
-            const insert = (await client.query(insertRetirada(), [assistido_id, data_retirada])).rows[0];
-            await client.query('COMMIT');
-            return insert
-        } catch (error: any) {
-            await client.query('ROLLBACK');
-            getErrorMessage(error);
-            throw new AppError('Erro desconhecido', error)
-        }
+  }
+  async insert(input: IRetirada): Promise<IRetirada> {
+    try {
+      const { assistido_id, data_retirada } = input;
+      const insert = await prisma.retiradas.create({
+        data: {
+          assistido_id,
+          data_retirada,
+        },
+      });
+      return insert;
+    } catch (error: any) {
+      getErrorMessage(error);
+      throw new AppError("Erro desconhecido", error);
     }
-    async update(id: number, input: IRetirada): Promise<IRetirada> {
-        const client = await pool.connect();
-        try {
-            const {assistido_id, data_retirada} = input;
-            await client.query('BEGIN');
-            const update = (await client.query(updateRetirada(), [assistido_id, data_retirada, id])).rows[0];
-            await client.query('COMMIT');
-            return update
-        } catch (error: any) {
-            await client.query('ROLLBACK');
-            getErrorMessage(error);
-            throw new AppError('Erro desconhecido', error)
-        }
+  }
+  async update(id: number, input: IRetirada): Promise<IRetirada> {
+    try {
+      const { assistido_id, data_retirada } = input;
+      const update = prisma.retiradas.update({
+        data: {
+          assistido_id,
+          data_retirada,
+        },
+        where: { id },
+      });
+      return update;
+    } catch (error: any) {
+      getErrorMessage(error);
+      throw new AppError("Erro desconhecido", error);
     }
-    async delete(id: number): Promise<void> {
-        const client = await pool.connect();
-        try {
-            await client.query('BEGIN');
-            const deleteUser = (await client.query(deleteRetirada(), [id]));
-            await client.query('COMMIT');
-            return
-        } catch (error: any) {
-            await client.query('ROLLBACK');
-            getErrorMessage(error);
-            throw new AppError('Erro desconhecido', error)
-        }
+  }
+  async delete(id: number): Promise<void> {
+    try {
+      await prisma.retiradas.delete({
+        where: { id },
+      });
+      return;
+    } catch (error: any) {
+      getErrorMessage(error);
+      throw new AppError("Erro desconhecido", error);
     }
-    async countRetiradasByAssistido(id: number): Promise<number> {
-        try {
-            const show = (await  pool.query(countRetiradasByAssistidoId(),[id])).rows[0];
-            return show
-        } catch (error: any) {
-            getErrorMessage(error);
-            throw new AppError('Erro desconhecido', error)
-        }
+  }
+  async countRetiradasByAssistido(id: number): Promise<number> {
+    try {
+      const show = prisma.retiradas.count({
+        where: { assistido_id: id },
+      });
+      return show;
+    } catch (error: any) {
+      getErrorMessage(error);
+      throw new AppError("Erro desconhecido", error);
     }
-    async selectByData(data: string): Promise<IRetirada[]> {
-        try {
-            const index = (await  pool.query(selectRetiradaByData(),[data])).rows;
-            return index
-        } catch (error: any) {
-            getErrorMessage(error);
-            throw new AppError('Erro desconhecido', error)
-        }
+  }
+  async selectByData(data: string): Promise<IRetirada[]> {
+    try {
+      const index = await prisma.retiradas.findMany({
+        select: {
+          id: true,
+          assistido_id: true,
+          data_retirada: true,
+        },
+        where: {
+          data_retirada: new Date(data),
+        },
+      });
+      return index;
+    } catch (error: any) {
+      getErrorMessage(error);
+      throw new AppError("Erro desconhecido", error);
     }
-    async selectByDataIntervalo(dataInicial: string, dataFinal: string): Promise<IRetirada[]> {
-        try {
-            const index = (await pool.query(selectRetiradaByDataIntervalo(),[dataInicial, dataFinal])).rows;
-            return index;
-        } catch (error: any) {
-            getErrorMessage(error);
-            throw new AppError('Erro desconhecido', error)
-        }
+  }
+  async selectByDataIntervalo(
+    dataInicial: string,
+    dataFinal: string
+  ): Promise<IRetirada[]> {
+    try {
+      const retiradas = await prisma.retiradas.findMany({
+        where: {
+          data_retirada: {
+            gte: new Date(dataInicial),
+            lte: new Date(dataFinal),
+          },
+        },
+        include: {
+          assistidos: {
+            select: {
+              nome: true,
+              documento: true,
+            },
+          },
+        },
+        orderBy: {
+          data_retirada: "desc",
+        },
+      });
+
+      return retiradas;
+    } catch (error: any) {
+      getErrorMessage(error);
+      throw new AppError("Erro desconhecido", error);
     }
-    async countByMes(ano: string): Promise<IRetiradasPorMes[]> {
-        try {
-            const index = (await pool.query(countRetiradasByMes(),[ano])).rows;
-            return index
-        } catch (error: any) {
-            getErrorMessage(error);
-            throw new AppError('Erro desconhecido', error)
+  }
+  async countByMes(ano: string): Promise<IRetiradasPorMes[]> {
+    try {
+      const retiradasPorMes = await prisma.retiradas.findMany({
+        where: {
+          data_retirada: {
+            gte: new Date(`${ano}-01-01`),
+            lte: new Date(`${ano}-12-31`),
+          },
+        },
+        select: {
+          data_retirada: true,
+        },
+      });
+
+      const retiradasAgrupadas: Record<string, number> = {};
+
+      retiradasPorMes.forEach((item) => {
+        const mesAno = `${
+          item.data_retirada.getMonth() + 1
+        }-${item.data_retirada.getFullYear()}`;
+        if (retiradasAgrupadas[mesAno]) {
+          retiradasAgrupadas[mesAno] += 1;
+        } else {
+          retiradasAgrupadas[mesAno] = 1;
         }
+      });
+
+      const resultado = Object.keys(retiradasAgrupadas).map((key) => {
+        const [mes, ano] = key.split("-");
+        const mesNome = new Date(`${ano}-${mes}-01`).toLocaleString("default", {
+          month: "long",
+        });
+        return {
+          mes: `${mesNome} de ${ano}`,
+          total: retiradasAgrupadas[key],
+        };
+      });
+
+      return resultado;
+    } catch (error: any) {
+      getErrorMessage(error);
+      throw new AppError("Erro desconhecido", error);
     }
-    async selectLastFive(): Promise<IRetirada[]> {
-        try {
-            const index = (await pool.query(selectLastFiveRetiradas())).rows;
-            return index
-        } catch (error: any) {
-            getErrorMessage(error);
-            throw new AppError('Erro desconhecido', error)
-        }
+  }
+
+  async selectLastFive(): Promise<IRetirada[]> {
+    try {
+      const retiradas = await prisma.retiradas.findMany({
+        take: 5,
+        orderBy: {
+          data_retirada: "desc",
+        },
+        include: {
+          assistidos: {
+            select: {
+              nome: true,
+              documento: true,
+            },
+          },
+        },
+      });
+
+      return retiradas;
+    } catch (error: any) {
+      getErrorMessage(error);
+      throw new AppError("Erro ao buscar últimas retiradas", error);
     }
+  }
 }
