@@ -107,7 +107,7 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
       const update = prisma.retiradas.update({
         data: {
           assistido_id,
-          data_retirada,
+          data_retirada: new Date (data_retirada),
         },
         where: { id },
       });
