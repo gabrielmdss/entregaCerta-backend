@@ -1,4 +1,5 @@
 import AppError from "../../../application/errors/appError";
+import { mapRetiradaToDTO } from "../../../constraints/mapper";
 import { getErrorMessage } from "../../../constraints/sql.errors.code";
 import {
   IRetirada,
@@ -23,13 +24,7 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
         },
       });
 
-      const result = index.map((item) => ({
-        id: item.id,
-        assistido_id: item.assistido_id,
-        data_retirada: item.data_retirada,
-        nome: item.assistidos.nome,
-        documento: item.assistidos.documento,
-      }));
+      const result = index.map(mapRetiradaToDTO);
 
       return result;
     } catch (error: any) {
@@ -84,13 +79,7 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
         },
         where: { assistido_id: id },
       });
-      const result = show.map((item) => ({
-        id: item.id,
-        assistido_id: item.assistido_id,
-        data_retirada: item.data_retirada,
-        nome: item.assistidos.nome,
-        documento: item.assistidos.documento,
-      }));
+      const result = show.map(mapRetiradaToDTO);
       return result;
     } catch (error: any) {
       getErrorMessage(error);
@@ -165,13 +154,7 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
         where: { data_retirada: new Date(data) },
       });
 
-      const result = index.map((item) => ({
-        id: item.id,
-        assistido_id: item.assistido_id,
-        data_retirada: item.data_retirada,
-        nome: item.assistidos.nome,
-        documento: item.assistidos.documento,
-      }))
+      const result = index.map(mapRetiradaToDTO)
       return result;
     } catch (error: any) {
       getErrorMessage(error);
@@ -203,13 +186,7 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
         },
       });
 
-      const result = retiradas.map((item) => ({
-        id: item.id,
-        assistido_id: item.assistido_id,
-        data_retirada: item.data_retirada,
-        nome: item.assistidos.nome,
-        documento: item.assistidos.documento,
-      }))
+      const result = retiradas.map(mapRetiradaToDTO)
 
       return result;
     } catch (error: any) {
@@ -279,13 +256,7 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
         },
       });
 
-      const result = retiradas.map((item) => ({
-        id: item.id,
-        assistido_id: item.assistido_id,
-        data_retirada: item.data_retirada,
-        nome: item.assistidos.nome,
-        documento: item.assistidos.documento,
-      }))
+      const result = retiradas.map(mapRetiradaToDTO)
 
       return result;
     } catch (error: any) {
