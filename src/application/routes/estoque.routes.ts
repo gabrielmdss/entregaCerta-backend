@@ -15,6 +15,9 @@ estoqueRoutes.get('/estoque', (req,res, next) => {
 estoqueRoutes.post('/estoque', (req,res, next) => {
     estoqueController.insert(req, res, next)
 });
+estoqueRoutes.post('/estoque/ajuste/:id', (req,res, next) => {
+    estoqueController.adjustStock(req, res, next)
+});
 estoqueRoutes.get('/estoque/:id', (req,res, next) => {
     estoqueController.getById(req, res, next)
 });

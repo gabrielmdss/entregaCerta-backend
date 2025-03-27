@@ -18,7 +18,6 @@ export default class EstoqueService {
     }
     return show;
   }
-
   async insert(input: IEstoque): Promise<IEstoque> {
     if (!input.quantidade || !input.quantidade) {
       throw new AppError("Preencha todos os dados", status.BAD_REQUEST);
@@ -56,5 +55,22 @@ export default class EstoqueService {
     await this.estoqueRepository.delete(id);
 
     return;
+  }
+  async adjustStock(id: number, quantidade: number): Promise<IEstoque | null> {
+    const insumo = await this.estoqueRepository.selectById(id);
+
+    if (insumo?.quantidade !== undefined) {
+      if (quantidade < 0 && insumo.quantidade < Math.abs(quantidade)) {
+        throw new AppError(
+          `Quantidade de ${insumo.descricao}(s) insuficiente`,
+          status.INTERNAL_SERVER
+        );
+      }
+    }
+    const adjustInsumo = await this.estoqueRepository.adjustStock(
+      id,
+      quantidade
+    );
+    return adjustInsumo;
   }
 }

@@ -92,7 +92,7 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
       const insert = await prisma.retiradas.create({
         data: {
           assistido_id,
-          data_retirada: new Date(data_retirada),
+          data_retirada: data_retirada
         },
       });
       return insert;

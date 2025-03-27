@@ -7,4 +7,6 @@ export interface EstoqueRepository {
   insert(input: IEstoque): Promise<IEstoque>;
   update(id: number, input: IEstoque): Promise<IEstoque>;
   delete(id: number): Promise<void>;
+  //======================================>
+  adjustStock(id: number, quantidade: number): Promise<IEstoque | null>;
 }

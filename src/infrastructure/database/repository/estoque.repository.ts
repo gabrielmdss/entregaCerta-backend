@@ -111,4 +111,21 @@ export default class EstoqueDatabaseRepository implements EstoqueRepository {
       throw new AppError("Erro desconhecido", error);
     }
   }
+  async adjustStock(id: number, quantidade: number): Promise<IEstoque> {
+    try {
+      const updateStock = await prisma.estoque.update({
+        where: { id },
+        data: {
+          quantidade: {
+            increment: quantidade,
+          },
+          data_atualizacao: new Date(),
+        },
+      });
+      return updateStock;
+    } catch (error: any) {
+      getErrorMessage(error);
+      throw new AppError("Erro desconhecido", error);
+    }
+  }
 }

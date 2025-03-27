@@ -5,9 +5,19 @@ import {
   IRetirada,
   IRetiradasPorMes,
 } from "../../domain/entity/retirada.entity";
+import { EstoqueRepository } from "../../domain/repository/estoque.repository";
+import EstoqueDatabaseRepository from "../../infrastructure/database/repository/estoque.repository";
+import { AssistidoRepository } from "../../domain/repository/assistido.repository";
+import AssistidoDatabaseRepository from "../../infrastructure/database/repository/assistido.repository";
 
 export default class RetiradaService {
-  constructor(private readonly retiradaRepository: RetiradaRepository) {}
+  private estoqueRepository: EstoqueRepository;
+  private assistidoRepository: AssistidoRepository;
+
+  constructor(private readonly retiradaRepository: RetiradaRepository) {
+    this.estoqueRepository = new EstoqueDatabaseRepository();
+    this.assistidoRepository = new AssistidoDatabaseRepository();
+  }
   async getAll(): Promise<IRetirada[]> {
     const index = await this.retiradaRepository.selectAll();
     return index;
@@ -33,15 +43,29 @@ export default class RetiradaService {
       throw new AppError("Preencha todos os dados", status.BAD_REQUEST);
     }
 
+    const assistido = await this.assistidoRepository.selectById(
+      input.assistido_id
+    );
+
+    if (!assistido) {
+      throw new AppError(
+        "Assistido não cadastrado, entre em contato com o suporte",
+        status.BAD_REQUEST
+      );
+    }
+
     if (!input.data_retirada || input.data_retirada === "") {
-      const dataToday = new Date().toISOString().split("T")[0];
-      input.data_retirada = dataToday
+      input.data_retirada = new Date();
+    } else {
+      input.data_retirada = new Date(input.data_retirada);
     }
 
     const retirada = await this.retiradaRepository.insert(input);
+
+    await this.estoqueRepository.adjustStock(1, -1);
+
     return retirada;
   }
-
   async update(id: number, input: IRetirada): Promise<IRetirada> {
     const retirada = await this.retiradaRepository.selectById(id);
 
