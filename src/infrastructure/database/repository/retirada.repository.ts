@@ -12,29 +12,59 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
   async selectAll(): Promise<IRetirada[]> {
     try {
       const index = await prisma.retiradas.findMany({
-        select: {
-          id: true,
-          assistido_id: true,
-          data_retirada: true,
+        include: {
+          assistidos: {
+            select: {
+              id: true,
+              nome: true,
+              documento: true,
+            },
+          },
         },
       });
-      return index;
+
+      const result = index.map((item) => ({
+        id: item.id,
+        assistido_id: item.assistido_id,
+        data_retirada: item.data_retirada,
+        nome: item.assistidos.nome,
+        documento: item.assistidos.documento,
+      }));
+
+      return result;
     } catch (error: any) {
       getErrorMessage(error);
       throw new AppError("Erro desconhecido", error);
     }
   }
+
   async selectById(id: number): Promise<IRetirada | null> {
     try {
       const show = await prisma.retiradas.findUnique({
-        select: {
-          id: true,
-          assistido_id: true,
-          data_retirada: true,
+        include: {
+          assistidos: {
+            select: {
+              id: true,
+              nome: true,
+              documento: true,
+            },
+          },
         },
         where: { id },
       });
-      return show;
+
+      if (show) {
+        const result = {
+          id: show.id,
+          assistido_id: show.assistido_id,
+          data_retirada: show.data_retirada,
+          nome: show.assistidos.nome,
+          documento: show.assistidos.documento,
+        };
+        return result;
+      } else {
+        return null;
+      }
     } catch (error: any) {
       getErrorMessage(error);
       throw new AppError("Erro desconhecido", error);
@@ -43,14 +73,25 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
   async selectByAssistidoId(id: number): Promise<IRetirada[]> {
     try {
       const show = await prisma.retiradas.findMany({
-        select: {
-          id: true,
-          assistido_id: true,
-          data_retirada: true,
+        include: {
+          assistidos: {
+            select: {
+              id: true,
+              nome: true,
+              documento: true,
+            },
+          },
         },
         where: { assistido_id: id },
       });
-      return show;
+      const result = show.map((item) => ({
+        id: item.id,
+        assistido_id: item.assistido_id,
+        data_retirada: item.data_retirada,
+        nome: item.assistidos.nome,
+        documento: item.assistidos.documento,
+      }));
+      return result;
     } catch (error: any) {
       getErrorMessage(error);
       throw new AppError("Erro desconhecido", error);
@@ -62,7 +103,7 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
       const insert = await prisma.retiradas.create({
         data: {
           assistido_id,
-          data_retirada,
+          data_retirada: new Date(data_retirada),
         },
       });
       return insert;
@@ -112,16 +153,26 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
   async selectByData(data: string): Promise<IRetirada[]> {
     try {
       const index = await prisma.retiradas.findMany({
-        select: {
-          id: true,
-          assistido_id: true,
-          data_retirada: true,
+        include: {
+          assistidos: {
+            select: {
+              id: true,
+              nome: true,
+              documento: true,
+            },
+          },
         },
-        where: {
-          data_retirada: new Date(data),
-        },
+        where: { data_retirada: new Date(data) },
       });
-      return index;
+
+      const result = index.map((item) => ({
+        id: item.id,
+        assistido_id: item.assistido_id,
+        data_retirada: item.data_retirada,
+        nome: item.assistidos.nome,
+        documento: item.assistidos.documento,
+      }))
+      return result;
     } catch (error: any) {
       getErrorMessage(error);
       throw new AppError("Erro desconhecido", error);
@@ -152,7 +203,15 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
         },
       });
 
-      return retiradas;
+      const result = retiradas.map((item) => ({
+        id: item.id,
+        assistido_id: item.assistido_id,
+        data_retirada: item.data_retirada,
+        nome: item.assistidos.nome,
+        documento: item.assistidos.documento,
+      }))
+
+      return result;
     } catch (error: any) {
       getErrorMessage(error);
       throw new AppError("Erro desconhecido", error);
@@ -220,7 +279,15 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
         },
       });
 
-      return retiradas;
+      const result = retiradas.map((item) => ({
+        id: item.id,
+        assistido_id: item.assistido_id,
+        data_retirada: item.data_retirada,
+        nome: item.assistidos.nome,
+        documento: item.assistidos.documento,
+      }))
+
+      return result;
     } catch (error: any) {
       getErrorMessage(error);
       throw new AppError("Erro ao buscar últimas retiradas", error);

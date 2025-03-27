@@ -1,4 +1,3 @@
-import { selectRetiradaByDataIntervalo } from "./../../infrastructure/database/scripts/retirada.script";
 import AppError from "../errors/appError";
 import * as status from "../../constraints/http.status";
 import { RetiradaRepository } from "../../domain/repository/retirada.repository";
