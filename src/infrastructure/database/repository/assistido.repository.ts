@@ -11,7 +11,7 @@ export default class AssistidoDatabaseRepository
   async selectAll(): Promise<IAssistido[]> {
     try {
       const index = await prisma.assistidos.findMany({
-        select: {
+        select: { 
           id: true,
           nome: true,
           documento: true,
