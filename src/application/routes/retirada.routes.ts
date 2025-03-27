@@ -9,7 +9,7 @@ const retiradaDatabase = new RetiradaDatabaseRepository();
 const retiradaService = new RetiradaService(retiradaDatabase);
 const retiradaController = new RetiradaController(retiradaService);
 
-retiradaRoutes.get('/retirada', (req,res, next) => {
+retiradaRoutes.get('/retirada/:page/:pageSize', (req,res, next) => {
     retiradaController.getAll(req, res, next)
 });
 retiradaRoutes.post('/retirada', (req,res, next) => {
@@ -17,6 +17,9 @@ retiradaRoutes.post('/retirada', (req,res, next) => {
 });
 retiradaRoutes.get('/retirada/ultimas', (req, res, next) => {
     retiradaController.selectLastFiveRetiradas(req, res, next);
+});
+retiradaRoutes.get('/retirada/total', (req,res, next) => {
+    retiradaController.countRetiradas(req, res, next)
 });
 retiradaRoutes.get('/retirada/total/:id', (req,res, next) => {
     retiradaController.countRetiradasByAssistidoId(req, res, next)

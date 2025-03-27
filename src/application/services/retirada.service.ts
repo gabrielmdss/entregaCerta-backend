@@ -18,8 +18,8 @@ export default class RetiradaService {
     this.estoqueRepository = new EstoqueDatabaseRepository();
     this.assistidoRepository = new AssistidoDatabaseRepository();
   }
-  async getAll(): Promise<IRetirada[]> {
-    const index = await this.retiradaRepository.selectAll();
+  async getAll(page: number, pageSize: number): Promise<IRetirada[]> {
+    const index = await this.retiradaRepository.selectAll(page, pageSize);
     return index;
   }
   async getById(id: number): Promise<IRetirada> {
@@ -87,6 +87,13 @@ export default class RetiradaService {
     const deleteRetirada = await this.retiradaRepository.delete(id);
 
     return;
+  }
+  async countRetiradas(): Promise<number>{
+    const show = this.retiradaRepository.countRetiradas();
+    if (!show) {
+      throw new AppError("Erro ao contabilizar retiradas", status.NOT_FOUND);
+    }
+    return show;
   }
   async countRetiradasByAssistidoId(id: number): Promise<number> {
     const show = await this.retiradaRepository.countRetiradasByAssistido(id);
