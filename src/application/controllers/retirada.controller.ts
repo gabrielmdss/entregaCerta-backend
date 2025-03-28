@@ -7,8 +7,17 @@ export default class RetiradaController {
 
   async getAll(request: Request, response: Response, next: NextFunction) {
     try {
+      const index = await this.retiradaService.getAll();
+      return response.status(status.SUCCESS).json(index);
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  }
+  async getAllWithPagination(request: Request, response: Response, next: NextFunction) {
+    try {
       const { page, pageSize } = request.params;
-      const index = await this.retiradaService.getAll(+page, +pageSize);
+      const index = await this.retiradaService.getAllWithPagination(+page, +pageSize);
       return response.status(status.SUCCESS).json(index);
     } catch (error) {
       console.log(error);

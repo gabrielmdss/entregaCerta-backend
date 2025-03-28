@@ -10,7 +10,30 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 export default class RetiradaDatabaseRepository implements RetiradaRepository {
-  async selectAll(page: number, pageSize: number): Promise<IRetirada[]> {
+  async selectAll(): Promise<IRetirada[]> {
+    try {
+
+      const index = await prisma.retiradas.findMany({
+        include: {
+          assistidos: {
+            select: {
+              id: true,
+              nome: true,
+              documento: true,
+            },
+          },
+        },
+      });
+
+      const result = index.map(mapRetiradaToDTO);
+
+      return result;
+    } catch (error: any) {
+      getErrorMessage(error);
+      throw new AppError("Erro desconhecido", error);
+    }
+  }
+  async selectAllWithPagination(page: number, pageSize: number): Promise<IRetirada[]> {
     try {
       const skip = (page - 1) * pageSize;
       const take = pageSize;

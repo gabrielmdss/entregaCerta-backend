@@ -18,8 +18,12 @@ export default class RetiradaService {
     this.estoqueRepository = new EstoqueDatabaseRepository();
     this.assistidoRepository = new AssistidoDatabaseRepository();
   }
-  async getAll(page: number, pageSize: number): Promise<IRetirada[]> {
-    const index = await this.retiradaRepository.selectAll(page, pageSize);
+  async getAll(): Promise<IRetirada[]> {
+    const index = await this.retiradaRepository.selectAll();
+    return index;
+  }
+  async getAllWithPagination(page: number, pageSize: number): Promise<IRetirada[]> {
+    const index = await this.retiradaRepository.selectAllWithPagination(page, pageSize);
     return index;
   }
   async getById(id: number): Promise<IRetirada> {

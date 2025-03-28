@@ -9,8 +9,11 @@ const retiradaDatabase = new RetiradaDatabaseRepository();
 const retiradaService = new RetiradaService(retiradaDatabase);
 const retiradaController = new RetiradaController(retiradaService);
 
-retiradaRoutes.get('/retirada/:page/:pageSize', (req,res, next) => {
+retiradaRoutes.get('/retirada', (req,res, next) => {
     retiradaController.getAll(req, res, next)
+});
+retiradaRoutes.get('/retirada/paginas/:page/:pageSize', (req,res, next) => {
+    retiradaController.getAllWithPagination(req, res, next)
 });
 retiradaRoutes.post('/retirada', (req,res, next) => {
     retiradaController.insert(req, res, next)
