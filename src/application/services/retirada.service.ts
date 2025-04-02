@@ -59,11 +59,11 @@ export default class RetiradaService {
     }
 
     if (!input.data_retirada || input.data_retirada === "") {
-      input.data_retirada = new Date();
+      input.data_retirada = new Date().toISOString();
     } else {
-      input.data_retirada = new Date(input.data_retirada);
+      input.data_retirada = new Date(input.data_retirada).toISOString();
     }
-
+    
     const retirada = await this.retiradaRepository.insert(input);
 
     await this.estoqueRepository.adjustStock(1, -1);
@@ -76,6 +76,13 @@ export default class RetiradaService {
     if (!retirada) {
       throw new AppError("Retirada não encontrada", status.INTERNAL_SERVER);
     }
+
+    if (!input.data_retirada || input.data_retirada === "") {
+      input.data_retirada = new Date().toISOString();
+    } else {
+      input.data_retirada = new Date(input.data_retirada).toISOString();
+    }
+    
 
     const retiradaAtualizada = await this.retiradaRepository.update(id, input);
 
@@ -108,7 +115,9 @@ export default class RetiradaService {
     return show;
   }
   async selectRetiradasByData(data: string): Promise<IRetirada[]> {
-    const index = this.retiradaRepository.selectByData(data);
+    const date = new Date(`${data}T00:00:00.000Z`);
+
+    const index = await this.retiradaRepository.selectByData(date.toISOString());
 
     if (!index) {
       throw new AppError(
@@ -145,9 +154,12 @@ export default class RetiradaService {
       );
     }
 
+    let dataInicialFormated = new Date(dataInicial).toISOString();
+    let dataFinalFormated = new Date(dataFinal).toISOString();
+
     const retiradas = await this.retiradaRepository.selectByDataIntervalo(
-      dataInicial,
-      dataFinal
+      dataInicialFormated,
+      dataFinalFormated
     );
 
     if (!retiradas) {

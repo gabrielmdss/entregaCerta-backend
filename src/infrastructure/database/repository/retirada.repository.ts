@@ -12,7 +12,6 @@ const prisma = new PrismaClient();
 export default class RetiradaDatabaseRepository implements RetiradaRepository {
   async selectAll(): Promise<IRetirada[]> {
     try {
-
       const index = await prisma.retiradas.findMany({
         include: {
           assistidos: {
@@ -22,6 +21,9 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
               documento: true,
             },
           },
+        },
+        orderBy: {
+          data_retirada: "desc",
         },
       });
 
@@ -33,12 +35,18 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
       throw new AppError("Erro desconhecido", error);
     }
   }
-  async selectAllWithPagination(page: number, pageSize: number): Promise<IRetirada[]> {
+  async selectAllWithPagination(
+    page: number,
+    pageSize: number
+  ): Promise<IRetirada[]> {
     try {
       const skip = (page - 1) * pageSize;
       const take = pageSize;
 
       const index = await prisma.retiradas.findMany({
+        orderBy: {
+          data_retirada: "desc",
+        },
         skip,
         take,
         include: {
@@ -49,7 +57,7 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
               documento: true,
             },
           },
-        },
+        }       
       });
 
       const result = index.map(mapRetiradaToDTO);
@@ -106,6 +114,9 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
           },
         },
         where: { assistido_id: id },
+        orderBy: {
+          data_retirada: "desc",
+        },
       });
       const result = show.map(mapRetiradaToDTO);
       return result;
@@ -120,7 +131,7 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
       const insert = await prisma.retiradas.create({
         data: {
           assistido_id,
-          data_retirada: data_retirada,
+          data_retirada,
         },
       });
       return insert;
@@ -135,7 +146,7 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
       const update = prisma.retiradas.update({
         data: {
           assistido_id,
-          data_retirada: new Date(data_retirada),
+          data_retirada,
         },
         where: { id },
       });
@@ -158,8 +169,8 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
   }
   async countRetiradas(): Promise<number> {
     try {
-      const index = prisma.retiradas.count()
-      return index
+      const index = prisma.retiradas.count();
+      return index;
     } catch (error: any) {
       getErrorMessage(error);
       throw new AppError("Erro desconhecido", error);
@@ -188,7 +199,7 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
             },
           },
         },
-        where: { data_retirada: new Date(data) },
+        where: { data_retirada: data },
       });
 
       const result = index.map(mapRetiradaToDTO);
@@ -206,8 +217,8 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
       const retiradas = await prisma.retiradas.findMany({
         where: {
           data_retirada: {
-            gte: new Date(dataInicial),
-            lte: new Date(dataFinal),
+            gte: dataInicial,
+            lte: dataFinal,
           },
         },
         include: {
