@@ -47,8 +47,8 @@ export default class AssistidoController {
     async update(request: Request, response: Response, next:NextFunction){
         try {
             const { id } = request.params;
-            const { input } = request.body
-            const update = await this.assistidoService.update(+id, input);
+            const  { nome, documento } = request.body
+            const update = await this.assistidoService.update(+id, {nome, documento});
             return response.status(status.SUCCESS).json(update)
         } catch (error) {
             console.log(error)
