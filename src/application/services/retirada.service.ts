@@ -64,6 +64,15 @@ export default class RetiradaService {
       input.data_retirada = new Date(input.data_retirada).toISOString();
     }
     
+    const estoque = await this.estoqueRepository.selectById(1)
+
+    if (!estoque || estoque.quantidade === undefined || estoque.quantidade < 1) {
+      throw new AppError(
+        "Estoque insuficiente",
+        status.BAD_REQUEST
+      );
+    }
+  
     const retirada = await this.retiradaRepository.insert(input);
 
     await this.estoqueRepository.adjustStock(1, -1);

@@ -49,6 +49,11 @@ export default class AssistidoService {
       throw new AppError("Assistido não encontrado", status.INTERNAL_SERVER);
     }
 
+    if (!input || Object.keys(input).length === 0 || (!input.nome?.trim() && !input.documento?.trim())) {
+      throw new AppError("Forneça ao menos um dado para atualização", status.INTERNAL_SERVER);
+    }
+    
+
     const assistidoAtualizado = await this.assistidoRepository.update(
       id,
       input

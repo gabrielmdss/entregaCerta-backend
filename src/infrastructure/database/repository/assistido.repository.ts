@@ -73,14 +73,21 @@ export default class AssistidoDatabaseRepository
 
   async update(id: number, input: IAssistido): Promise<IAssistido> {
     try {
-      const { nome, documento } = input;
+
+      const data: Partial<IAssistido> = {};
+
+      if (input.nome && input.nome.trim() !== "") {
+        data.nome = input.nome;
+      }
+  
+      if (input.documento && input.documento.trim() !== "") {
+        data.documento = input.documento;
+      }
       const update = await prisma.assistidos.update({
-        data: {
-          nome,
-          documento,
-        },
         where: { id },
+        data,
       });
+  
       return update;
     } catch (error: any) {
       getErrorMessage(error);
