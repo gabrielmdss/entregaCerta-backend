@@ -25,6 +25,7 @@
     "braces": "^3.0.3",
     "buffer-from": "^1.1.2",
     "chokidar": "^3.6.0",
+    "cloudinary": "^2.6.0",
     "concat-map": "^0.0.1",
     "cors": "^2.8.5",
     "create-require": "^1.1.1",
