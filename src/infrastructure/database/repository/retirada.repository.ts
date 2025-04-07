@@ -68,7 +68,6 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
       throw new AppError("Erro desconhecido", error);
     }
   }
-
   async selectById(id: number): Promise<IRetirada | null> {
     try {
       const show = await prisma.retiradas.findUnique({
@@ -187,38 +186,16 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
       throw new AppError("Erro desconhecido", error);
     }
   }
-  async selectByData(data: string): Promise<IRetirada[]> {
-    try {
-      const index = await prisma.retiradas.findMany({
-        include: {
-          assistidos: {
-            select: {
-              id: true,
-              nome: true,
-              documento: true,
-            },
-          },
-        },
-        where: { data_retirada: data },
-      });
-
-      const result = index.map(mapRetiradaToDTO);
-      return result;
-    } catch (error: any) {
-      getErrorMessage(error);
-      throw new AppError("Erro desconhecido", error);
-    }
-  }
   async selectByDataIntervalo(
-    dataInicial: string,
-    dataFinal: string
+    dataInicial: Date,
+    dataFinal: Date
   ): Promise<IRetirada[]> {
     try {
       const retiradas = await prisma.retiradas.findMany({
         where: {
           data_retirada: {
-            gte: dataInicial,
-            lte: dataFinal,
+            gte: dataInicial,  
+            lte: dataFinal,    
           },
         },
         include: {
@@ -233,9 +210,9 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
           data_retirada: "desc",
         },
       });
-
+  
       const result = retiradas.map(mapRetiradaToDTO);
-
+  
       return result;
     } catch (error: any) {
       getErrorMessage(error);
@@ -286,7 +263,6 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
       throw new AppError("Erro desconhecido", error);
     }
   }
-
   async selectLastFive(): Promise<IRetirada[]> {
     try {
       const retiradas = await prisma.retiradas.findMany({

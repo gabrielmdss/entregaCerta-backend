@@ -18,6 +18,7 @@ export default class RetiradaService {
     this.estoqueRepository = new EstoqueDatabaseRepository();
     this.assistidoRepository = new AssistidoDatabaseRepository();
   }
+  
   async getAll(): Promise<IRetirada[]> {
     const index = await this.retiradaRepository.selectAll();
     return index;
@@ -123,20 +124,6 @@ export default class RetiradaService {
     }
     return show;
   }
-  async selectRetiradasByData(data: string): Promise<IRetirada[]> {
-    const date = new Date(`${data}T00:00:00.000Z`);
-
-    const index = await this.retiradaRepository.selectByData(date.toISOString());
-
-    if (!index) {
-      throw new AppError(
-        "Retirada não encontrada nesta data",
-        status.NOT_FOUND
-      );
-    }
-
-    return index;
-  }
   async selectRetiradaByDataIntervalo(
     dataInicial: string,
     dataFinal: string
@@ -147,7 +134,7 @@ export default class RetiradaService {
         status.BAD_REQUEST
       );
     }
-
+  
     const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
     if (!dateRegex.test(dataInicial) || !dateRegex.test(dataFinal)) {
       throw new AppError(
@@ -155,29 +142,29 @@ export default class RetiradaService {
         status.BAD_REQUEST
       );
     }
-
-    if (new Date(dataInicial) > new Date(dataFinal)) {
+  
+    const dataInicialObj = new Date(`${dataInicial}T00:00:00.000Z`);
+    const dataFinalObj = new Date(`${dataFinal}T23:59:59.999Z`);   
+  
+    if (dataInicialObj > dataFinalObj) {
       throw new AppError(
         "A data inicial não pode ser posterior à data final.",
         status.BAD_REQUEST
       );
     }
-
-    let dataInicialFormated = new Date(dataInicial).toISOString();
-    let dataFinalFormated = new Date(dataFinal).toISOString();
-
+  
     const retiradas = await this.retiradaRepository.selectByDataIntervalo(
-      dataInicialFormated,
-      dataFinalFormated
+      dataInicialObj,
+      dataFinalObj
     );
-
-    if (!retiradas) {
+  
+    if (!retiradas || retiradas.length === 0) {
       throw new AppError(
         "Nenhuma retirada encontrada no intervalo especificado.",
         status.NOT_FOUND
       );
     }
-
+  
     return retiradas;
   }
   async countRetiradasMesByAno(ano: string): Promise<IRetiradasPorMes[]> {

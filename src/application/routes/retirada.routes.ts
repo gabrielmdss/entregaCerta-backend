@@ -30,9 +30,6 @@ retiradaRoutes.get('/retirada/total/:id', (req,res, next) => {
 retiradaRoutes.get('/retirada/assistido/:id', (req,res, next) => {
     retiradaController.getByAssistidoId(req, res, next)
 });
-retiradaRoutes.get('/retirada/data/:data', (req,res, next) => {
-    retiradaController.selectRetiradasByData(req, res, next)
-});
 retiradaRoutes.get('/retirada/periodo/:dataInicial/:dataFinal', (req,res, next) => {
     retiradaController.selectRetiradasByDataIntervalo(req, res, next)
 });
