@@ -15,6 +15,8 @@ export default class AssistidoDatabaseRepository
           id: true,
           nome: true,
           documento: true,
+          data_nascimento: true,
+          imagem: true
         },
       });
       return index;
@@ -30,6 +32,8 @@ export default class AssistidoDatabaseRepository
           id: true,
           nome: true,
           documento: true,
+          data_nascimento: true,
+          imagem: true
         },
         where: { id },
       });
@@ -46,6 +50,8 @@ export default class AssistidoDatabaseRepository
           id: true,
           nome: true,
           documento: true,
+          data_nascimento: true,
+          imagem: true
         },
         where: { documento },
       });
@@ -57,11 +63,14 @@ export default class AssistidoDatabaseRepository
   }
   async insert(input: IAssistido): Promise<IAssistido> {
     try {
-      const { nome, documento } = input;
+      const { nome, documento, data_nascimento, imagem } = input;
+
       const assistido = await prisma.assistidos.create({
         data: {
           nome,
           documento,
+          data_nascimento: data_nascimento ?? null,
+          imagem: imagem ?? null
         },
       });
       return assistido;
@@ -73,16 +82,14 @@ export default class AssistidoDatabaseRepository
 
   async update(id: number, input: IAssistido): Promise<IAssistido> {
     try {
-
       const data: Partial<IAssistido> = {};
-
-      if (input.nome && input.nome.trim() !== "") {
-        data.nome = input.nome;
+  
+      for (const [key, value] of Object.entries(input)) {
+        if (value !== undefined && value !== null && value !== "") {
+          (data as any)[key] = value;
+        }
       }
   
-      if (input.documento && input.documento.trim() !== "") {
-        data.documento = input.documento;
-      }
       const update = await prisma.assistidos.update({
         where: { id },
         data,
@@ -94,6 +101,7 @@ export default class AssistidoDatabaseRepository
       throw new AppError("Erro desconhecido", error);
     }
   }
+  
   async delete(id: number): Promise<void> {
     try {
       await prisma.assistidos.delete({

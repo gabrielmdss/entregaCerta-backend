@@ -8,10 +8,12 @@ datasource db {
 }
 
 model assistidos {
-  id        Int         @id @default(autoincrement())
-  nome      String
-  documento String
-  retiradas retiradas[]
+  id              Int         @id @default(autoincrement())
+  nome            String
+  documento       String
+  data_nascimento DateTime?   @db.Date
+  imagem          String?
+  retiradas       retiradas[]
 }
 
 model estoque {

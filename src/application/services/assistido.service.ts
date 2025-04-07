@@ -26,18 +26,32 @@ export default class AssistidoService {
     return show;
   }
   async insert(input: IAssistido): Promise<IAssistido> {
-    
-    if (!input.nome || !input.documento) {
-      throw new AppError("Preencha todos os dados", status.BAD_REQUEST);
+    const camposObrigatorios: (keyof IAssistido)[] = [
+      "nome",
+      "documento",
+      "data_nascimento",
+    ];
+
+    for (const campo of camposObrigatorios) {
+      if (!input[campo] || input[campo]?.toString().trim() === "") {
+        throw new AppError(
+          `Preencha todos os campos obrigatórios`,
+          status.BAD_REQUEST
+        );
+      }
     }
-    
+
     const assistidoByDocumento =
-    await this.assistidoRepository.selectByDocumento(input.documento);
-    
+      await this.assistidoRepository.selectByDocumento(input.documento);
+
     if (assistidoByDocumento) {
       throw new AppError("Documento já cadastrado", status.INTERNAL_SERVER);
     }
     
+    if (input.data_nascimento) {
+      input.data_nascimento = new Date(input.data_nascimento);
+    }
+
     const assistido = await this.assistidoRepository.insert(input);
 
     return assistido;
@@ -49,10 +63,16 @@ export default class AssistidoService {
       throw new AppError("Assistido não encontrado", status.INTERNAL_SERVER);
     }
 
-    if (!input || Object.keys(input).length === 0 || (!input.nome?.trim() && !input.documento?.trim())) {
-      throw new AppError("Forneça ao menos um dado para atualização", status.INTERNAL_SERVER);
+    if (
+      !input ||
+      Object.keys(input).length === 0 ||
+      (!input.nome?.trim() && !input.documento?.trim())
+    ) {
+      throw new AppError(
+        "Forneça ao menos um dado para atualização",
+        status.INTERNAL_SERVER
+      );
     }
-    
 
     const assistidoAtualizado = await this.assistidoRepository.update(
       id,
