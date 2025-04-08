@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import EstoqueService from "../services/estoque.service";
-import * as status from "../../constraints/http.status";
+import * as status from "../utils/http.status";
 
 export default class EstoqueController {
   constructor(private estoqueService: EstoqueService) {}

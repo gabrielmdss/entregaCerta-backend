@@ -1,7 +1,7 @@
 import { IEstoque } from "../../domain/entity/estoque.entity";
 import { EstoqueRepository } from "../../domain/repository/estoque.repository";
 import AppError from "../errors/appError";
-import * as status from "../../constraints/http.status";
+import * as status from "../utils/http.status";
 
 export default class EstoqueService {
   constructor(private estoqueRepository: EstoqueRepository) {}

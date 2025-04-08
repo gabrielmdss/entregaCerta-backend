@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client';
-import AppError from '../application/errors/appError';
+import AppError from '../errors/appError';
 import * as status from './http.status';
 
 // Erros comuns do PostgreSQL

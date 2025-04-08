@@ -1,5 +1,5 @@
 import AppError from "../errors/appError";
-import * as status from "../../constraints/http.status";
+import * as status from "../utils/http.status";
 import { RetiradaRepository } from "../../domain/repository/retirada.repository";
 import {
   IRetirada,
