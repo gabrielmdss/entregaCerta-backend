@@ -1,5 +1,5 @@
 import AppError from "../../../application/errors/appError";
-import { getErrorMessage } from "../../../constraints/sql.errors.code";
+import { getErrorMessage } from "../../../application/utils/sql.errors.code";
 import { IEstoque } from "../../../domain/entity/estoque.entity";
 import { EstoqueRepository } from "../../../domain/repository/estoque.repository";
 import { PrismaClient } from "@prisma/client";

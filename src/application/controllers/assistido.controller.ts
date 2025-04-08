@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import AssistidoService from "../services/assistido.service";
-import * as status from "../../constraints/http.status";
+import * as status from "../utils/http.status";
 
 export default class AssistidoController {
   constructor(private readonly assistidoService: AssistidoService) {}

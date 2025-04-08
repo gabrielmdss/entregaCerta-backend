@@ -1,6 +1,6 @@
 import AppError from "../../../application/errors/appError";
 import { mapRetiradaToDTO } from "../../../constraints/mapper";
-import { getErrorMessage } from "../../../constraints/sql.errors.code";
+import { getErrorMessage } from "../../../application/utils/sql.errors.code";
 import {
   IRetirada,
   IRetiradasPorMes,

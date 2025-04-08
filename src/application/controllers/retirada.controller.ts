@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import * as status from "../../constraints/http.status";
+import * as status from "../utils/http.status";
 import RetiradaService from "../services/retirada.service";
 
 export default class RetiradaController {
