@@ -65,7 +65,7 @@ export default class RetiradaService {
       input.data_retirada = new Date(input.data_retirada).toISOString();
     }
     
-    const estoque = await this.estoqueRepository.selectById(1)
+    const estoque = await this.estoqueRepository.selectByDescricao("Cesta")
 
     if (!estoque || estoque.quantidade === undefined || estoque.quantidade < 1) {
       throw new AppError(
@@ -76,7 +76,9 @@ export default class RetiradaService {
   
     const retirada = await this.retiradaRepository.insert(input);
 
-    await this.estoqueRepository.adjustStock(1, -1);
+    if(estoque.id){
+      await this.estoqueRepository.adjustStock(estoque.id, -1);
+    }
 
     return retirada;
   }
