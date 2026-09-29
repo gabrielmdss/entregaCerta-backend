@@ -10,7 +10,6 @@ export default class EstoqueController {
       const index = await this.estoqueService.getAll();
       return response.status(status.SUCCESS).json(index);
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
@@ -20,7 +19,6 @@ export default class EstoqueController {
       const show = await this.estoqueService.getById(+id);
       return response.status(status.SUCCESS).json(show);
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
@@ -30,7 +28,6 @@ export default class EstoqueController {
       const insert = await this.estoqueService.insert(input);
       return response.status(status.CREATED).json(insert);
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
@@ -41,7 +38,6 @@ export default class EstoqueController {
       const update = await this.estoqueService.update(+id, input);
       return response.status(status.SUCCESS).json(update);
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
@@ -51,7 +47,6 @@ export default class EstoqueController {
       const deleteInsumo = await this.estoqueService.delete(+id);
       return response.status(status.NO_CONTENT).json(deleteInsumo);
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
@@ -62,7 +57,6 @@ export default class EstoqueController {
       const adjust = await this.estoqueService.adjustStock(+id, quantidade);
       return response.status(status.SUCCESS).json(adjust);
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }

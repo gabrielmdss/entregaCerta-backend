@@ -10,7 +10,6 @@ export default class RetiradaController {
       const index = await this.retiradaService.getAll();
       return response.status(status.SUCCESS).json(index);
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
@@ -20,7 +19,6 @@ export default class RetiradaController {
       const index = await this.retiradaService.getAllWithPagination(+page, +pageSize);
       return response.status(status.SUCCESS).json(index);
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
@@ -30,7 +28,6 @@ export default class RetiradaController {
       const show = await this.retiradaService.getById(+id);
       return response.status(status.SUCCESS).json(show);
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
@@ -44,7 +41,6 @@ export default class RetiradaController {
       const show = await this.retiradaService.getByAssistidoId(+id);
       return response.status(status.SUCCESS).json(show);
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
@@ -54,7 +50,6 @@ export default class RetiradaController {
       const insert = await this.retiradaService.insert(input);
       return response.status(status.CREATED).json(insert);
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
@@ -65,7 +60,6 @@ export default class RetiradaController {
       const update = await this.retiradaService.update(+id, input);
       return response.status(status.SUCCESS).json(update);
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
@@ -75,7 +69,6 @@ export default class RetiradaController {
       const deleteRetirada = await this.retiradaService.delete(+id);
       return response.status(status.NO_CONTENT).json(deleteRetirada);
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
@@ -88,7 +81,6 @@ export default class RetiradaController {
       const show = await this.retiradaService.countRetiradas();
       return response.status(status.SUCCESS).json(show);
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
@@ -102,7 +94,6 @@ export default class RetiradaController {
       const show = await this.retiradaService.countRetiradasByAssistidoId(+id);
       return response.status(status.SUCCESS).json(show);
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
@@ -119,7 +110,6 @@ export default class RetiradaController {
       );
       return response.status(status.SUCCESS).json(show);
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
@@ -133,7 +123,6 @@ export default class RetiradaController {
       const show = await this.retiradaService.countRetiradasMesByAno(ano);
       return response.status(status.SUCCESS).json(show);
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
@@ -146,7 +135,6 @@ export default class RetiradaController {
       const show = await this.retiradaService.selectLastFiveRetiradas();
       return response.status(status.SUCCESS).json(show);
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }

@@ -10,7 +10,6 @@ export default class AssistidoController {
       const index = await this.assistidoService.getAll();
       return response.status(status.SUCCESS).json(index);
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
@@ -20,7 +19,6 @@ export default class AssistidoController {
       const show = await this.assistidoService.getById(+id);
       return response.status(status.SUCCESS).json(show);
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
@@ -34,7 +32,6 @@ export default class AssistidoController {
       const show = await this.assistidoService.getByDocumento(documento);
       return response.status(status.SUCCESS).json(show);
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
@@ -44,7 +41,6 @@ export default class AssistidoController {
       const insert = await this.assistidoService.insert(input);
       return response.status(status.CREATED).json(insert);
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
@@ -60,7 +56,6 @@ export default class AssistidoController {
       });
       return response.status(status.SUCCESS).json(update);
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
@@ -70,7 +65,6 @@ export default class AssistidoController {
       const deleteAssitido = await this.assistidoService.delete(+id);
       return response.status(status.NO_CONTENT).json(deleteAssitido);
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
@@ -83,7 +77,6 @@ export default class AssistidoController {
       const show = await this.assistidoService.countAllAssistidos();
       return response.status(status.SUCCESS).json({ total: show });
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }

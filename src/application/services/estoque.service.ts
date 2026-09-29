@@ -28,7 +28,7 @@ export default class EstoqueService {
     );
 
     if (itemByDescricao) {
-      throw new AppError("Item já cadastrado", status.INTERNAL_SERVER);
+      throw new AppError("Item já cadastrado", status.CONFLICT);
     }
 
     const insumo = await this.estoqueRepository.insert(input);
@@ -39,7 +39,7 @@ export default class EstoqueService {
     const insumoById = await this.estoqueRepository.selectById(id);
 
     if (!insumoById) {
-      throw new AppError("insumo não encontrado", status.INTERNAL_SERVER);
+      throw new AppError("Insumo não encontrado", status.NOT_FOUND);
     }
 
     const insumoAtualizado = await this.estoqueRepository.update(id, input);
@@ -49,7 +49,7 @@ export default class EstoqueService {
     const insumo = await this.estoqueRepository.selectById(id);
 
     if (!insumo) {
-      throw new AppError("Insumo não encontrado", status.INTERNAL_SERVER);
+      throw new AppError("Insumo não encontrado", status.NOT_FOUND);
     }
 
     await this.estoqueRepository.delete(id);
@@ -59,11 +59,15 @@ export default class EstoqueService {
   async adjustStock(id: number, quantidade: number): Promise<IEstoque | null> {
     const insumo = await this.estoqueRepository.selectById(id);
 
-    if (insumo?.quantidade !== undefined) {
+    if (!insumo) {
+      throw new AppError("Insumo não encontrado", status.NOT_FOUND);
+    }
+
+    if (insumo.quantidade !== undefined) {
       if (quantidade < 0 && insumo.quantidade < Math.abs(quantidade)) {
         throw new AppError(
           `Quantidade de ${insumo.descricao}(s) insuficiente`,
-          status.INTERNAL_SERVER
+          status.BAD_REQUEST
         );
       }
     }

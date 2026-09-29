@@ -1,24 +1,24 @@
 import { NextFunction, Request, Response } from "express";
-import AppError from "../errors/appError";
+import { toAppError } from "../utils/sql.errors.code";
+import * as status from "../utils/http.status";
 
 const Errors = (
-  error: Error,
+  error: unknown,
   req: Request,
   res: Response,
   next: NextFunction
 ): any => {
-    if (error instanceof AppError) {
-    return res.status(error.statusCode).json({
-      status: "error",
-      statusCode: error.statusCode,
-      message: error.message,
-    });
+  const appError = toAppError(error);
+
+  // Log apenas de erros inesperados (5xx), no servidor, sem o corpo da requisição.
+  if (appError.statusCode >= status.INTERNAL_SERVER) {
+    console.error(`[${req.method} ${req.originalUrl}]`, appError.cause ?? appError);
   }
 
-  return res.status(500).json({
+  return res.status(appError.statusCode).json({
     status: "error",
-    message: "Internal server error",
+    statusCode: appError.statusCode,
+    message: appError.message,
   });
-
 };
 export default Errors;

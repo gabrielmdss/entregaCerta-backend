@@ -21,38 +21,53 @@ export const sqlErrorCodes: Record<string, { message: string; statusCode: number
     '50000': { message: 'Erro genérico. Favor entrar em contato com o suporte.', statusCode: status.INTERNAL_SERVER }
 };
 
-// Tratamento de erros do Prisma e PostgreSQL
-export const getErrorMessage = (error: any): never => {
-    console.error('Erro capturado:', error);
+// Erros conhecidos do Prisma (PrismaClientKnownRequestError.code)
+export const prismaErrorCodes: Record<string, { message: string; statusCode: number }> = {
+    P2000: { message: 'Valor muito longo para o campo informado.', statusCode: status.BAD_REQUEST },
+    P2002: { message: 'Registro duplicado. Já existe um cadastro com esses dados.', statusCode: status.CONFLICT },
+    P2003: { message: 'Operação não permitida: existem registros associados.', statusCode: status.CONFLICT },
+    P2011: { message: 'Campo obrigatório não informado.', statusCode: status.BAD_REQUEST },
+    P2025: { message: 'Registro não encontrado.', statusCode: status.NOT_FOUND },
+};
+
+export const GENERIC_ERROR_MESSAGE = 'Erro interno do servidor.';
+
+/**
+ * Converte qualquer erro (Prisma, PostgreSQL ou genérico) em AppError,
+ * sem expor detalhes internos ao cliente. O erro original fica em `cause`
+ * para ser registrado no servidor pelo middleware de erros.
+ */
+export const toAppError = (error: any): AppError => {
+    if (error instanceof AppError) return error;
 
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        const errorCode = error.code;
-        if (sqlErrorCodes[errorCode]) {
-            throw new AppError(sqlErrorCodes[errorCode].message, sqlErrorCodes[errorCode].statusCode);
-        }
-    }
-
-    if (error instanceof Prisma.PrismaClientUnknownRequestError) {
-        throw new AppError('Erro desconhecido no Prisma. Contate o suporte.', status.INTERNAL_SERVER);
+        const known = prismaErrorCodes[error.code] ?? sqlErrorCodes[error.code];
+        if (known) return new AppError(known.message, known.statusCode, error);
     }
 
     if (error instanceof Prisma.PrismaClientValidationError) {
-        throw new AppError('Erro de validação nos dados enviados.', status.BAD_REQUEST);
+        return new AppError('Erro de validação nos dados enviados.', status.BAD_REQUEST, error);
     }
 
     if (error instanceof Prisma.PrismaClientInitializationError) {
-        throw new AppError('Erro ao inicializar o Prisma. Verifique a conexão com o banco.', status.SERVICE_UNAVAILABLE);
+        return new AppError('Serviço de banco de dados indisponível.', status.SERVICE_UNAVAILABLE, error);
     }
 
-    if (error instanceof Prisma.PrismaClientRustPanicError) {
-        throw new AppError('Erro crítico interno no Prisma.', status.INTERNAL_SERVER);
+    // Erros SQL conhecidos (ex.: driver pg)
+    if (error && typeof error.code === 'string' && sqlErrorCodes[error.code]) {
+        const known = sqlErrorCodes[error.code];
+        return new AppError(known.message, known.statusCode, error);
     }
 
-    // Caso não seja erro do Prisma, verifica os erros SQL conhecidos
-    if (error.code && sqlErrorCodes[error.code]) {
-        throw new AppError(sqlErrorCodes[error.code].message, sqlErrorCodes[error.code].statusCode);
+    // Body JSON malformado (express.json)
+    if (error && error.type === 'entity.parse.failed') {
+        return new AppError('JSON inválido no corpo da requisição.', status.BAD_REQUEST, error);
     }
 
-    // Caso contrário, erro genérico
-    throw new AppError(error.message || 'Erro desconhecido.', status.INTERNAL_SERVER);
+    return new AppError(GENERIC_ERROR_MESSAGE, status.INTERNAL_SERVER, error);
+};
+
+// Usado pelos repositórios: relança o erro já convertido em AppError.
+export const getErrorMessage = (error: any): never => {
+    throw toAppError(error);
 };

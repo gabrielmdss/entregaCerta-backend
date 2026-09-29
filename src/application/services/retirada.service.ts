@@ -14,9 +14,13 @@ export default class RetiradaService {
   private estoqueRepository: EstoqueRepository;
   private assistidoRepository: AssistidoRepository;
 
-  constructor(private readonly retiradaRepository: RetiradaRepository) {
-    this.estoqueRepository = new EstoqueDatabaseRepository();
-    this.assistidoRepository = new AssistidoDatabaseRepository();
+  constructor(
+    private readonly retiradaRepository: RetiradaRepository,
+    estoqueRepository?: EstoqueRepository,
+    assistidoRepository?: AssistidoRepository
+  ) {
+    this.estoqueRepository = estoqueRepository ?? new EstoqueDatabaseRepository();
+    this.assistidoRepository = assistidoRepository ?? new AssistidoDatabaseRepository();
   }
   
   async getAll(): Promise<IRetirada[]> {
@@ -86,7 +90,7 @@ export default class RetiradaService {
     const retirada = await this.retiradaRepository.selectById(id);
 
     if (!retirada) {
-      throw new AppError("Retirada não encontrada", status.INTERNAL_SERVER);
+      throw new AppError("Retirada não encontrada", status.NOT_FOUND);
     }
 
     if (!input.data_retirada || input.data_retirada === "") {
@@ -104,7 +108,7 @@ export default class RetiradaService {
     const retirada = await this.retiradaRepository.selectById(id);
 
     if (!retirada) {
-      throw new AppError("Retirada não encontrado", status.INTERNAL_SERVER);
+      throw new AppError("Retirada não encontrada", status.NOT_FOUND);
     }
 
     const deleteRetirada = await this.retiradaRepository.delete(id);
