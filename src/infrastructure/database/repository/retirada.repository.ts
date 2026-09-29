@@ -1,6 +1,7 @@
 import AppError from "../../../application/errors/appError";
 import { mapRetiradaToDTO } from "../../../constraints/mapper";
 import { getErrorMessage } from "../../../application/utils/sql.errors.code";
+import { agruparRetiradasPorMes } from "../../../application/utils/retiradas.por.mes";
 import { decrypt } from "../../../application/utils/crypto"; // <-- importa a função decrypt
 import {
   IRetirada,
@@ -304,31 +305,9 @@ export default class RetiradaDatabaseRepository implements RetiradaRepository {
         },
       });
 
-      const retiradasAgrupadas: Record<string, number> = {};
-
-      retiradasPorMes.forEach((item) => {
-        const mesAno = `${
-          item.data_retirada.getMonth() + 1
-        }-${item.data_retirada.getFullYear()}`;
-        if (retiradasAgrupadas[mesAno]) {
-          retiradasAgrupadas[mesAno] += 1;
-        } else {
-          retiradasAgrupadas[mesAno] = 1;
-        }
-      });
-
-      const resultado = Object.keys(retiradasAgrupadas).map((key) => {
-        const [mes, ano] = key.split("-");
-        const mesNome = new Date(`${ano}-${mes}-01`).toLocaleString("default", {
-          month: "long",
-        });
-        return {
-          mes: `${mesNome} de ${ano}`,
-          total: retiradasAgrupadas[key],
-        };
-      });
-
-      return resultado;
+      return agruparRetiradasPorMes(
+        retiradasPorMes.map((item) => item.data_retirada)
+      );
     } catch (error: any) {
       getErrorMessage(error);
       throw new AppError("Erro desconhecido", error);
