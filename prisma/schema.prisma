@@ -11,6 +11,7 @@ model assistidos {
   id              Int         @id @default(autoincrement())
   nome            String
   documento       String
+  documento_hash  String?     @unique @db.Char(64)
   data_nascimento DateTime?   @db.Date
   imagem          String?
   retiradas       retiradas[]

@@ -1,5 +1,6 @@
 import AppError from "../../../application/errors/appError";
-import { encrypt, decrypt } from "../../../application/utils/crypto"; // <- Adicionamos o decrypt aqui
+import { encrypt, decrypt } from "../../../application/utils/crypto";
+import { hashDocumento, normalizeDocumento } from "../../../application/utils/documento.hash";
 import { getErrorMessage } from "../../../application/utils/sql.errors.code";
 import { IAssistido } from "../../../domain/entity/assistido.entity";
 import { AssistidoRepository } from "../../../domain/repository/assistido.repository";
@@ -58,11 +59,11 @@ export default class AssistidoDatabaseRepository
   }
 
   async selectByDocumento(documento: string): Promise<IAssistido | null> {
-
-    const encryptedDocument = encrypt(documento)
+    // Documento cifrado usa IV aleatório; a busca é feita pelo hash determinístico.
+    if (!normalizeDocumento(documento)) return null;
 
     try {
-      const show = await prisma.assistidos.findFirst({
+      const show = await prisma.assistidos.findUnique({
         select: {
           id: true,
           nome: true,
@@ -70,7 +71,7 @@ export default class AssistidoDatabaseRepository
           data_nascimento: true,
           imagem: true,
         },
-        where: { documento: encryptedDocument },
+        where: { documento_hash: hashDocumento(documento) },
       });
 
       if (!show) return null;
@@ -92,15 +93,17 @@ export default class AssistidoDatabaseRepository
       const assistido = await prisma.assistidos.create({
         data: {
           nome,
-          documento: encrypt(documento), 
+          documento: encrypt(documento),
+          documento_hash: normalizeDocumento(documento) ? hashDocumento(documento) : null,
           data_nascimento: data_nascimento ?? null,
           imagem: imagem ?? null,
         },
       });
 
+      const { documento_hash: _h, ...criado } = assistido;
       return {
-        ...assistido,
-        documento: decrypt(assistido.documento),
+        ...criado,
+        documento: decrypt(criado.documento),
       };
     } catch (error: any) {
       getErrorMessage(error);
@@ -110,11 +113,16 @@ export default class AssistidoDatabaseRepository
 
   async update(id: number, input: IAssistido): Promise<IAssistido> {
     try {
-      const data: Partial<IAssistido> = {};
+      const data: Record<string, any> = {};
 
       for (const [key, value] of Object.entries(input)) {
         if (value !== undefined && value !== null && value !== "") {
-          (data as any)[key] = key === "documento" ? encrypt(value) : value;
+          if (key === "documento") {
+            data.documento = encrypt(value);
+            data.documento_hash = normalizeDocumento(value) ? hashDocumento(value) : null;
+          } else {
+            data[key] = value;
+          }
         }
       }
 
@@ -123,9 +131,10 @@ export default class AssistidoDatabaseRepository
         data,
       });
 
+      const { documento_hash: _h, ...atualizado } = update;
       return {
-        ...update,
-        documento: decrypt(update.documento),
+        ...atualizado,
+        documento: decrypt(atualizado.documento),
       };
     } catch (error: any) {
       getErrorMessage(error);
