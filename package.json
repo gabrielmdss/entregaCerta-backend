@@ -25,6 +25,7 @@
     "braces": "^3.0.3",
     "buffer-from": "^1.1.2",
     "chokidar": "^3.6.0",
+    "cloudinary": "^2.6.0",
     "concat-map": "^0.0.1",
     "cors": "^2.8.5",
     "create-require": "^1.1.1",
@@ -76,9 +77,9 @@
     "yn": "^3.1.1"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --test --require ./tests/setup.js --require ts-node/register tests/*.test.ts",
     "dev": "ts-node-dev --respawn --transpile-only server.ts",
-    "build": "tsc",
+    "build": "npm install && npx prisma db push && npx prisma generate && tsc",
     "start": "node ./dist/server.js"
   },
   "repository": {

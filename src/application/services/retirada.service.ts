@@ -1,15 +1,34 @@
 import AppError from "../errors/appError";
-import * as status from "../../constraints/http.status";
+import * as status from "../utils/http.status";
 import { RetiradaRepository } from "../../domain/repository/retirada.repository";
 import {
   IRetirada,
   IRetiradasPorMes,
 } from "../../domain/entity/retirada.entity";
+import { EstoqueRepository } from "../../domain/repository/estoque.repository";
+import EstoqueDatabaseRepository from "../../infrastructure/database/repository/estoque.repository";
+import { AssistidoRepository } from "../../domain/repository/assistido.repository";
+import AssistidoDatabaseRepository from "../../infrastructure/database/repository/assistido.repository";
 
 export default class RetiradaService {
-  constructor(private readonly retiradaRepository: RetiradaRepository) {}
+  private estoqueRepository: EstoqueRepository;
+  private assistidoRepository: AssistidoRepository;
+
+  constructor(
+    private readonly retiradaRepository: RetiradaRepository,
+    estoqueRepository?: EstoqueRepository,
+    assistidoRepository?: AssistidoRepository
+  ) {
+    this.estoqueRepository = estoqueRepository ?? new EstoqueDatabaseRepository();
+    this.assistidoRepository = assistidoRepository ?? new AssistidoDatabaseRepository();
+  }
+  
   async getAll(): Promise<IRetirada[]> {
     const index = await this.retiradaRepository.selectAll();
+    return index;
+  }
+  async getAllWithPagination(page: number, pageSize: number): Promise<IRetirada[]> {
+    const index = await this.retiradaRepository.selectAllWithPagination(page, pageSize);
     return index;
   }
   async getById(id: number): Promise<IRetirada> {
@@ -33,21 +52,53 @@ export default class RetiradaService {
       throw new AppError("Preencha todos os dados", status.BAD_REQUEST);
     }
 
-    if (!input.data_retirada || input.data_retirada === "") {
-      const dataToday = new Date().toISOString().split("T")[0];
-      input.data_retirada = dataToday
+    const assistido = await this.assistidoRepository.selectById(
+      input.assistido_id
+    );
+
+    if (!assistido) {
+      throw new AppError(
+        "Assistido não cadastrado, entre em contato com o suporte",
+        status.BAD_REQUEST
+      );
     }
 
+    if (!input.data_retirada || input.data_retirada === "") {
+      input.data_retirada = new Date().toISOString();
+    } else {
+      input.data_retirada = new Date(input.data_retirada).toISOString();
+    }
+    
+    const estoque = await this.estoqueRepository.selectByDescricao("Cesta")
+
+    if (!estoque || estoque.quantidade === undefined || estoque.quantidade < 1) {
+      throw new AppError(
+        "Estoque insuficiente",
+        status.BAD_REQUEST
+      );
+    }
+  
     const retirada = await this.retiradaRepository.insert(input);
+
+    if(estoque.id){
+      await this.estoqueRepository.adjustStock(estoque.id, -1);
+    }
+
     return retirada;
   }
-
   async update(id: number, input: IRetirada): Promise<IRetirada> {
     const retirada = await this.retiradaRepository.selectById(id);
 
     if (!retirada) {
-      throw new AppError("Retirada não encontrada", status.INTERNAL_SERVER);
+      throw new AppError("Retirada não encontrada", status.NOT_FOUND);
     }
+
+    if (!input.data_retirada || input.data_retirada === "") {
+      input.data_retirada = new Date().toISOString();
+    } else {
+      input.data_retirada = new Date(input.data_retirada).toISOString();
+    }
+    
 
     const retiradaAtualizada = await this.retiradaRepository.update(id, input);
 
@@ -57,12 +108,19 @@ export default class RetiradaService {
     const retirada = await this.retiradaRepository.selectById(id);
 
     if (!retirada) {
-      throw new AppError("Retirada não encontrado", status.INTERNAL_SERVER);
+      throw new AppError("Retirada não encontrada", status.NOT_FOUND);
     }
 
     const deleteRetirada = await this.retiradaRepository.delete(id);
 
     return;
+  }
+  async countRetiradas(): Promise<number>{
+    const show = this.retiradaRepository.countRetiradas();
+    if (!show) {
+      throw new AppError("Erro ao contabilizar retiradas", status.NOT_FOUND);
+    }
+    return show;
   }
   async countRetiradasByAssistidoId(id: number): Promise<number> {
     const show = await this.retiradaRepository.countRetiradasByAssistido(id);
@@ -71,18 +129,6 @@ export default class RetiradaService {
       throw new AppError("Retirada não encontrada", status.NOT_FOUND);
     }
     return show;
-  }
-  async selectRetiradasByData(data: string): Promise<IRetirada[]> {
-    const index = this.retiradaRepository.selectByData(data);
-
-    if (!index) {
-      throw new AppError(
-        "Retirada não encontrada nesta data",
-        status.NOT_FOUND
-      );
-    }
-
-    return index;
   }
   async selectRetiradaByDataIntervalo(
     dataInicial: string,
@@ -94,7 +140,7 @@ export default class RetiradaService {
         status.BAD_REQUEST
       );
     }
-
+  
     const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
     if (!dateRegex.test(dataInicial) || !dateRegex.test(dataFinal)) {
       throw new AppError(
@@ -102,26 +148,29 @@ export default class RetiradaService {
         status.BAD_REQUEST
       );
     }
-
-    if (new Date(dataInicial) > new Date(dataFinal)) {
+  
+    const dataInicialObj = new Date(`${dataInicial}T00:00:00.000Z`);
+    const dataFinalObj = new Date(`${dataFinal}T23:59:59.999Z`);   
+  
+    if (dataInicialObj > dataFinalObj) {
       throw new AppError(
         "A data inicial não pode ser posterior à data final.",
         status.BAD_REQUEST
       );
     }
-
+  
     const retiradas = await this.retiradaRepository.selectByDataIntervalo(
-      dataInicial,
-      dataFinal
+      dataInicialObj,
+      dataFinalObj
     );
-
-    if (!retiradas) {
+  
+    if (!retiradas || retiradas.length === 0) {
       throw new AppError(
         "Nenhuma retirada encontrada no intervalo especificado.",
         status.NOT_FOUND
       );
     }
-
+  
     return retiradas;
   }
   async countRetiradasMesByAno(ano: string): Promise<IRetiradasPorMes[]> {

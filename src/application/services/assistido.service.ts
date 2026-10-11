@@ -1,7 +1,7 @@
 import { IAssistido } from "../../domain/entity/assistido.entity";
 import { AssistidoRepository } from "../../domain/repository/assistido.repository";
 import AppError from "../errors/appError";
-import * as status from "../../constraints/http.status";
+import * as status from "../utils/http.status";
 
 export default class AssistidoService {
   constructor(private readonly assistidoRepository: AssistidoRepository) {}
@@ -26,41 +26,80 @@ export default class AssistidoService {
     return show;
   }
   async insert(input: IAssistido): Promise<IAssistido> {
-    
-    if (!input.nome || !input.documento) {
-      throw new AppError("Preencha todos os dados", status.BAD_REQUEST);
+    const camposObrigatorios: (keyof IAssistido)[] = [
+      "nome",
+      "documento",
+      "data_nascimento",
+    ];
+
+    for (const campo of camposObrigatorios) {
+      if (!input[campo] || input[campo]?.toString().trim() === "") {
+        throw new AppError(
+          `Preencha todos os campos obrigatórios`,
+          status.BAD_REQUEST
+        );
+      }
     }
-    
+
     const assistidoByDocumento =
-    await this.assistidoRepository.selectByDocumento(input.documento);
-    
+      await this.assistidoRepository.selectByDocumento(input.documento);
+
     if (assistidoByDocumento) {
-      throw new AppError("Documento já cadastrado", status.INTERNAL_SERVER);
+      throw new AppError("Documento já cadastrado", status.CONFLICT);
     }
-    
+
+    if (input.data_nascimento) {
+      input.data_nascimento = new Date(input.data_nascimento);
+    }
+
     const assistido = await this.assistidoRepository.insert(input);
 
     return assistido;
   }
   async update(id: number, input: IAssistido): Promise<IAssistido> {
+    const camposObrigatorios: (keyof IAssistido)[] = [
+      "nome",
+      "documento",
+      "data_nascimento",
+      "imagem"
+    ];
+  
     const assistido = await this.assistidoRepository.selectById(id);
-
+  
     if (!assistido) {
-      throw new AppError("Assistido não encontrado", status.INTERNAL_SERVER);
+      throw new AppError("Assistido não encontrado", status.NOT_FOUND);
+    }
+  
+    const temAlgumCampoPreenchido = camposObrigatorios.some((campo) => {
+      const valor = input[campo];
+      return valor !== undefined && valor !== null && String(valor).trim() !== "";
+    });
+  
+    if (!temAlgumCampoPreenchido) {
+      throw new AppError(
+        "Forneça ao menos um dado válido para atualização",
+        status.BAD_REQUEST
+      );
+    }
+  
+    const novoDocumento = input.documento;
+    if (novoDocumento !== undefined && novoDocumento !== null && String(novoDocumento).trim() !== "") {
+      const existente = await this.assistidoRepository.selectByDocumento(String(novoDocumento));
+      if (existente && Number(existente.id) !== Number(id)) {
+        throw new AppError("Documento já cadastrado", status.CONFLICT);
+      }
     }
 
-    const assistidoAtualizado = await this.assistidoRepository.update(
-      id,
-      input
-    );
-
+    const assistidoAtualizado = await this.assistidoRepository.update(id, input);
+  
     return assistidoAtualizado;
   }
+  
   async delete(id: number): Promise<void> {
     const assistido = await this.assistidoRepository.selectById(id);
 
     if (!assistido) {
-      throw new AppError("Assistido não encontrado", status.INTERNAL_SERVER);
+      throw new AppError("Assistido não encontrado", status.NOT_FOUND);
     }
 
     const deleteAssistido = await this.assistidoRepository.delete(id);

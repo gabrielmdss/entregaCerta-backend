@@ -1,4 +1,10 @@
 DATABASE_URL=postgresql://postgres@localhost:5432/entregaCerta
 PORT=3020
 
-//commit autorizando build
+CLOUDINARY_CLOUD_NAME
+CLOUDINARY_API_KEY
+CLOUDINARY_API_SECRET
+
+CRYPTO_KEY
+DOCUMENTO_HASH_KEY
+

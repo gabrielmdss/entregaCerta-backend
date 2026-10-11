@@ -8,15 +8,37 @@ datasource db {
 }
 
 model assistidos {
-  id        Int         @id @default(autoincrement())
-  nome      String
-  documento String
-  retiradas retiradas[]
+  id              Int         @id @default(autoincrement())
+  nome            String
+  documento       String
+  documento_hash  String?     @unique @db.Char(64)
+  data_nascimento DateTime?   @db.Date
+  imagem          String?
+  retiradas       retiradas[]
+}
+
+model estoque {
+  id               Int                @id @default(autoincrement())
+  quantidade       Int
+  descricao        String?            @db.VarChar(255)
+  data_atualizacao DateTime?          @default(now()) @db.Timestamp(6)
+  retirada_estoque retirada_estoque[]
+}
+
+model retirada_estoque {
+  id                  Int       @id @default(autoincrement())
+  retirada_id         Int
+  quantidade_retirada Int
+  estoque_id          Int
+  data_retirada       DateTime? @default(now()) @db.Timestamp(6)
+  estoque             estoque   @relation(fields: [estoque_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  retiradas           retiradas @relation(fields: [retirada_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model retiradas {
-  id            Int        @id @default(autoincrement())
-  assistido_id  Int
-  data_retirada DateTime   @db.Date
-  assistidos    assistidos @relation(fields: [assistido_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_assistido")
+  id               Int                @id @default(autoincrement())
+  assistido_id     Int
+  data_retirada    DateTime           @db.Timestamptz(6)
+  retirada_estoque retirada_estoque[]
+  assistidos       assistidos         @relation(fields: [assistido_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_assistido")
 }
