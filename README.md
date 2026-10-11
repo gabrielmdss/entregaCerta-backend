@@ -61,4 +61,4 @@ npm run dev
 
 ## Author
 
-**Gabriel Mendes**, Full Stack Developer · [Portfolio](https://portfolio-wine-nu-30.vercel.app) · [LinkedIn](https://linkedin.com/in/gabrielmendesdeveloper)
+**Gabriel Mendes**, Full Stack Developer · [Portfolio](https://gabriel-mendes-dev.vercel.app) · [LinkedIn](https://linkedin.com/in/gabrielmendesdeveloper)
